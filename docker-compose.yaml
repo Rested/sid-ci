@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  # core
+  daemon:
+    build: daemon
+    environment:
+      - POLL_FREQUENCY_SECONDS=5
+      - POSTGRES_DSN=postgres://postgres:@db:5432/postgres
+      - REDIS_DSN=redis://daemon:@redis:6379
+      - GIT_PROJECTS_PATH=/git-projects
+      - DB_TIMEOUT=10
+      - REDIS_TIMEOUT=5
+      - ID_RSA_PATH=/config/id_rsa
+      - GIT_AUTHOR_EMAIL=daemon@sidci.io
+      - GIT_AUTHOR_NAME=sid daemon
+
+    depends_on:
+      - db
+      - fake-git-server
+      - redis
+    volumes:
+      - ./fake_git_agent/server/keys/id_rsa:/config/id_rsa
+  db:
+    image: postgres:11.6
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./fake_git_agent/test-data.sql:/docker-entrypoint-initdb.d/test-data.sql
+  redis:
+    image: redis
+  
+  # testing
+  fake-git-server:
+    build: fake_git_agent/server
+    volumes:
+       - ./fake_git_agent/server/keys/id_rsa.pub:/git-server/keys/id_rsa.pub 
+  dev-bot:
+    environment:
+      - GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+    depends_on:
+      - daemon
+      - fake-git-server
+    build: fake_git_agent
+
+  

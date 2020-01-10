@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "daemon"
+version = "0.1.1"
+description = "sid ci daemon"
+authors = ["Reuben Thomas-Davis <reubenestd@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+gitpython = "^3.0"
+redis = "^3.3"
+pydantic = "^1.3"
+python-daemon = "^2.2"
+psycopg2-binary = "^2.8"
+
+[tool.poetry.dev-dependencies]
+prospector = "^1.2.0"
+mypy = "^0.761"
+black = "^19.10b0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
