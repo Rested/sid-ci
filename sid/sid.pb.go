@@ -4,9 +4,13 @@
 package sid
 
 import (
+	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -369,4 +373,244 @@ var fileDescriptor_923cdea5d0e24e4a = []byte{
 	0xda, 0x84, 0xae, 0x59, 0xbe, 0x29, 0xec, 0xc3, 0xe6, 0x5d, 0x2f, 0x0f, 0x15, 0xfb, 0x28, 0x6a,
 	0x28, 0x57, 0x9e, 0xfd, 0x08, 0x00, 0x00, 0xff, 0xff, 0x58, 0xee, 0x4b, 0x9b, 0x99, 0x03, 0x00,
 	0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// SidClient is the client API for Sid service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type SidClient interface {
+	// A simple RPC.
+	//
+	// Obtains the feature at a given position.
+	//
+	// A feature with an empty name is returned if there's no feature at the given
+	// position.
+	GetJob(ctx context.Context, in *HealthStatus, opts ...grpc.CallOption) (*Job, error)
+	// A server-to-client streaming RPC.
+	//
+	// Streams health status of the client as it changes.
+	HealthStatusCheckIn(ctx context.Context, in *HealthStatus, opts ...grpc.CallOption) (Sid_HealthStatusCheckInClient, error)
+	// A client-to-server streaming RPC.
+	//
+	// Accepts a stream of JobRunEvents on a job being run, returning a
+	// job when done.
+	RecordJobRun(ctx context.Context, opts ...grpc.CallOption) (Sid_RecordJobRunClient, error)
+}
+
+type sidClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewSidClient(cc *grpc.ClientConn) SidClient {
+	return &sidClient{cc}
+}
+
+func (c *sidClient) GetJob(ctx context.Context, in *HealthStatus, opts ...grpc.CallOption) (*Job, error) {
+	out := new(Job)
+	err := c.cc.Invoke(ctx, "/sid.Sid/GetJob", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sidClient) HealthStatusCheckIn(ctx context.Context, in *HealthStatus, opts ...grpc.CallOption) (Sid_HealthStatusCheckInClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Sid_serviceDesc.Streams[0], "/sid.Sid/HealthStatusCheckIn", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &sidHealthStatusCheckInClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Sid_HealthStatusCheckInClient interface {
+	Recv() (*CheckInResponse, error)
+	grpc.ClientStream
+}
+
+type sidHealthStatusCheckInClient struct {
+	grpc.ClientStream
+}
+
+func (x *sidHealthStatusCheckInClient) Recv() (*CheckInResponse, error) {
+	m := new(CheckInResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *sidClient) RecordJobRun(ctx context.Context, opts ...grpc.CallOption) (Sid_RecordJobRunClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Sid_serviceDesc.Streams[1], "/sid.Sid/RecordJobRun", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &sidRecordJobRunClient{stream}
+	return x, nil
+}
+
+type Sid_RecordJobRunClient interface {
+	Send(*JobRunEvent) error
+	CloseAndRecv() (*Job, error)
+	grpc.ClientStream
+}
+
+type sidRecordJobRunClient struct {
+	grpc.ClientStream
+}
+
+func (x *sidRecordJobRunClient) Send(m *JobRunEvent) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *sidRecordJobRunClient) CloseAndRecv() (*Job, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(Job)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// SidServer is the server API for Sid service.
+type SidServer interface {
+	// A simple RPC.
+	//
+	// Obtains the feature at a given position.
+	//
+	// A feature with an empty name is returned if there's no feature at the given
+	// position.
+	GetJob(context.Context, *HealthStatus) (*Job, error)
+	// A server-to-client streaming RPC.
+	//
+	// Streams health status of the client as it changes.
+	HealthStatusCheckIn(*HealthStatus, Sid_HealthStatusCheckInServer) error
+	// A client-to-server streaming RPC.
+	//
+	// Accepts a stream of JobRunEvents on a job being run, returning a
+	// job when done.
+	RecordJobRun(Sid_RecordJobRunServer) error
+}
+
+// UnimplementedSidServer can be embedded to have forward compatible implementations.
+type UnimplementedSidServer struct {
+}
+
+func (*UnimplementedSidServer) GetJob(ctx context.Context, req *HealthStatus) (*Job, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetJob not implemented")
+}
+func (*UnimplementedSidServer) HealthStatusCheckIn(req *HealthStatus, srv Sid_HealthStatusCheckInServer) error {
+	return status.Errorf(codes.Unimplemented, "method HealthStatusCheckIn not implemented")
+}
+func (*UnimplementedSidServer) RecordJobRun(srv Sid_RecordJobRunServer) error {
+	return status.Errorf(codes.Unimplemented, "method RecordJobRun not implemented")
+}
+
+func RegisterSidServer(s *grpc.Server, srv SidServer) {
+	s.RegisterService(&_Sid_serviceDesc, srv)
+}
+
+func _Sid_GetJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HealthStatus)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SidServer).GetJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sid.Sid/GetJob",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SidServer).GetJob(ctx, req.(*HealthStatus))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Sid_HealthStatusCheckIn_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(HealthStatus)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(SidServer).HealthStatusCheckIn(m, &sidHealthStatusCheckInServer{stream})
+}
+
+type Sid_HealthStatusCheckInServer interface {
+	Send(*CheckInResponse) error
+	grpc.ServerStream
+}
+
+type sidHealthStatusCheckInServer struct {
+	grpc.ServerStream
+}
+
+func (x *sidHealthStatusCheckInServer) Send(m *CheckInResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Sid_RecordJobRun_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(SidServer).RecordJobRun(&sidRecordJobRunServer{stream})
+}
+
+type Sid_RecordJobRunServer interface {
+	SendAndClose(*Job) error
+	Recv() (*JobRunEvent, error)
+	grpc.ServerStream
+}
+
+type sidRecordJobRunServer struct {
+	grpc.ServerStream
+}
+
+func (x *sidRecordJobRunServer) SendAndClose(m *Job) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *sidRecordJobRunServer) Recv() (*JobRunEvent, error) {
+	m := new(JobRunEvent)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+var _Sid_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "sid.Sid",
+	HandlerType: (*SidServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetJob",
+			Handler:    _Sid_GetJob_Handler,
+		},
+	},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "HealthStatusCheckIn",
+			Handler:       _Sid_HealthStatusCheckIn_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "RecordJobRun",
+			Handler:       _Sid_RecordJobRun_Handler,
+			ClientStreams: true,
+		},
+	},
+	Metadata: "sid.proto",
 }
