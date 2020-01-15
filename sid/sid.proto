@@ -7,7 +7,7 @@ import "google/protobuf/timestamp.proto";
 
 
 // Interface exported by the server.
-service RouteGuide {
+service Sid {
   // A simple RPC.
   //
   // Obtains the feature at a given position.
