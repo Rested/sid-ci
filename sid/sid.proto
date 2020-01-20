@@ -46,6 +46,7 @@ message Job {
     BUILDING = 1;
     ABANDONED = 2;
     COMPLETED = 3;
+    FAILED = 5;
   }
   string repo_name = 1;
   string repo_ssh_url = 2;
