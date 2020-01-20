@@ -63,6 +63,7 @@ message JobRunEvent {
   EventType type = 1;
   string content = 2;
   google.protobuf.Timestamp event_at = 3;
+  Job job = 4;
 }
 
 message CheckInResponse {
