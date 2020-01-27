@@ -34,13 +34,10 @@ var (
 	queueSize   = flag.Int("queue_size", 100, "Number of jobs to queue at a time.")
 )
 
-type token struct {
-	clientId   int
-	validUntil time.Time
-}
+
 
 var (
-	tokenCache map[string]token
+	tokenCache map[string]dbapi.Token
 )
 
 type sidServer struct {
@@ -93,6 +90,13 @@ func (s *sidServer) AddJob(ctx context.Context, job *pb.Job) (*pb.Job, error) {
 	return dbJob, nil
 }
 
+func (s *sidServer) Login(ctx context.Context, details *pb.LoginRequest) (*pb.Token, error)  {
+	// check if details match someone
+	// if so return a token
+	// otherwise return nothing
+	return &pb.Token{}, errors.New("login failed")
+}
+
 // ListFeatures lists all features contained within the given bounding Rectangle.
 func (s *sidServer) HealthStatusCheckIn(stream pb.Sid_HealthStatusCheckInServer) error {
 	for {
@@ -124,7 +128,8 @@ func (s *sidServer) RecordJobRun(stream pb.Sid_RecordJobRunServer) error {
 				JobStatus:    pb.Job_FAILED,
 				StatusAt:     jobEvent.EventAt,
 			}
-			return stream.SendAndClose(&updatedJob)
+			// record event async in db
+			// change the job status to failed
 		}
 		if err == io.EOF {
 			// check the last event was not a failure
@@ -174,7 +179,7 @@ func authFunc(ctx context.Context) (context.Context, error) {
 	}
 	if tokenInfo, ok := tokenCache[token]; ok {
 		// check if token is expired
-		if time.Now().After(tokenInfo.validUntil) {
+		if time.Now().After(tokenInfo.ValidUntil) {
 			// remove the token
 			delete(tokenCache, token)
 			return context.TODO(), errors.New("expired token")

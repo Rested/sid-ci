@@ -1,84 +1,87 @@
-
 syntax = "proto3";
 
 package sid;
 
 import "google/protobuf/timestamp.proto";
 
-
 // Interface exported by the server.
 service Sid {
-  // Obtains a job from the queue
-  rpc GetJob(HealthStatus) returns (Job) {}
+    // Obtains a job from the queue
+    rpc GetJob (HealthStatus) returns (Job) {
+    }
 
-  // Adds a job to the queue
-  rpc AddJob(Job) returns (Job) {}
+    // Adds a job to the queue
+    rpc AddJob (Job) returns (Job) {
+    }
 
-  // Log in
-  rpc Login(LoginRequest) returns (Token) {}
+    // Log in
+    rpc Login (LoginRequest) returns (Token) {
+    }
 
-  // A client-to-server streaming RPC.
-  //
-  // Streams health status of the client as it changes. 
-  rpc HealthStatusCheckIn(stream HealthStatus) returns (CheckInResponse) {}
+    // A client-to-server streaming RPC.
+    //
+    // Streams health status of the client as it changes.
+    rpc HealthStatusCheckIn (stream HealthStatus) returns (CheckInResponse) {
+    }
 
-  // A client-to-server streaming RPC.
-  //
-  // Accepts a stream of JobRunEvents on a job being run, returning a
-  // job when done.
-  rpc RecordJobRun(stream JobRunEvent) returns (Job) {}
+    // A client-to-server streaming RPC.
+    //
+    // Accepts a stream of JobRunEvents on a job being run, returning a
+    // job when done.
+    rpc RecordJobRun (stream JobRunEvent) returns (Job) {
+    }
 }
 
 message Token {
-  string token = 1;
+    string token = 1;
 }
 
 // Login Request
 message LoginRequest {
-  string identifier = 1;
-  string password = 2;
+    string identifier = 1;
+    string password = 2;
 }
 
 // HealthStatus
 message HealthStatus {
-  enum Status {
-    INACTIVE = 0;
-    READY = 1;
-    WORKING = 2;
-    LEAVING = 3;
-  }
-  Status status = 1;
-  google.protobuf.Timestamp status_at = 2;
+    enum Status {
+        INACTIVE = 0;
+        READY = 1;
+        WORKING = 2;
+        LEAVING = 3;
+    }
+    Status status = 1;
+    google.protobuf.Timestamp status_at = 2;
 }
 
 message Job {
-  enum JobStatus {
-    QUEUED = 0;
-    BUILDING = 1;
-    ABANDONED = 2;
-    COMPLETED = 3;
-    FAILED = 5;
-  }
-  string repo_name = 1;
-  string repo_ssh_url = 2;
-  string commit_hexsha = 3;
-  JobStatus job_status = 4;
-  google.protobuf.Timestamp status_at = 5;
-  string job_uuid = 6;
+    enum JobStatus {
+        QUEUED = 0;
+        BUILDING = 1;
+        ABANDONED = 2;
+        COMPLETED = 3;
+        FAILED = 5;
+    }
+    string repo_name = 1;
+    string repo_ssh_url = 2;
+    string commit_hexsha = 3;
+    JobStatus job_status = 4;
+    google.protobuf.Timestamp status_at = 5;
+    string job_uuid = 6;
 }
 
 message JobRunEvent {
-  enum EventType {
-    RUN_LOG = 0;
-    ERROR = 1;
-    // TODO: ARTEFACT = 2; https://ops.tips/blog/sending-files-via-grpc/ w/ streaming
-  }
-  EventType type = 1;
-  string content = 2;
-  google.protobuf.Timestamp event_at = 3;
-  Job job = 4;
+    enum EventType {
+        RUN_LOG = 0;
+        ERROR = 1;
+        // TODO: ARTEFACT = 2; https://ops.tips/blog/sending-files-via-grpc/ w/ streaming
+    }
+    EventType type = 1;
+    string content = 2;
+    google.protobuf.Timestamp event_at = 3;
+    Job job = 4;
 }
 
 message CheckInResponse {
-  string response = 1;
+    string response = 1;
 }

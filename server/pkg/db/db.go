@@ -1,22 +1,28 @@
 package db
 
 import (
-	"database/sql"
 	"context"
+	"database/sql"
+	"errors"
 	"github.com/golang/protobuf/ptypes"
 	pb "github.com/sid-ci/server/pkg/gen"
 	"time"
 )
 
+type Token struct {
+	ClientId   int
+	ValidUntil time.Time
+}
+
 type Result struct {
-	succeeded bool
-	runEvents string
+	succeeded   bool
+	runEvents   string
 	imageDigest string
-	gitHexSha string
-	jobUuid string
-	runBy int
-	repo int
-	receivedAt time.Time
+	gitHexSha   string
+	jobUuid     string
+	runBy       int
+	repo        int
+	receivedAt  time.Time
 }
 
 func GetJobStatus(ctx context.Context, db sql.DB, jobUuid string) (*pb.Job, error) {
@@ -30,18 +36,18 @@ SELECT succeeded, received_at from sid_ci.results where job_uuid = ?;
 	}
 	statusAt, err := ptypes.TimestampProto(result.receivedAt)
 	if err != nil {
-		return  &pb.Job{}, err
+		return &pb.Job{}, err
 	}
 	var status pb.Job_JobStatus
 	if result.succeeded {
 		status = pb.Job_FAILED
-	}else{
+	} else {
 		status = pb.Job_COMPLETED
 	}
 	return &pb.Job{
 		JobStatus: status,
-		JobUuid:  jobUuid,
-		StatusAt: statusAt,
+		JobUuid:   jobUuid,
+		StatusAt:  statusAt,
 	}, nil
 }
 
@@ -58,7 +64,11 @@ WHERE
 	if healthStatus.Status == pb.HealthStatus_INACTIVE {
 		active = false
 	}
-	_, err := db.Exec(query, ptypes.Timestamp(healthStatus.StatusAt), healthStatus.Status, active)
+	tokenInfo, ok := ctx.Value("tokenInfo").(Token)
+	if !ok {
+		return errors.New("no token info found")
+	}
+	_, err := db.Exec(query, ptypes.Timestamp(healthStatus.StatusAt), healthStatus.Status, active, tokenInfo.ClientId)
 	if err != nil {
 		return err
 	}
