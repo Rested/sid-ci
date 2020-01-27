@@ -22,3 +22,5 @@ class Settings(pydantic.BaseSettings):
     id_rsa_path: pydantic.FilePath  # used by git-exe.sh
     log_level: LogLevelEnum = LogLevelEnum.INFO
     abandonment_timeout: int = 60 * 10
+    sid_server_dsn: pydantic.AnyUrl
+    sid_server_timeout: int = 60

@@ -8,6 +8,12 @@ from pathlib import Path
 import psycopg2
 import json
 import logging
+import sid_pb2_grpc
+from google.protobuf.timestamp_pb2 import Timestamp
+import sid_pb2
+from uuid import uuid4
+import grpc
+import base64
 
 settings = Settings()
 logging.basicConfig(level=settings.log_level.value)
@@ -79,13 +85,25 @@ def check_for_changes_to_enabled_repos(repos: Tuple[Repository]) -> List[Reposit
 def add_changed_repos_to_queue(
     changed_repos: Tuple[Repository],
     redis_conn: redis.Redis,
-    db_conn: psycopg2.extensions.connection,
+    stub: sid_pb2_grpc.SidStub
 ):
     # add to fifo queue
     for repo in changed_repos:
+        # send to the server
+        timestamp = Timestamp()
+
+        stub.AddJob(sid_pb2.Job(
+            repo_name=repo.name,
+            repo_ssh_url=repo.ssh_url,
+            commit_hexsha=repo.target_ref,
+            job_status=sid_pb2.Job.JobStatus.QUEUED,
+            status_at=timestamp.GetCurrentTime(),
+            job_uuid=base64.b64encode(f"{repo.ssh_url}:{repo.target_ref}".encode("utf-8")).decode('utf-8')
+        ))
+
         # check it is not already queued
         if any(
-            status == STATUS_QUEUED
+            status == sid_pb2.Job.JobStatus.QUEUED
             for status in redis_conn.hscan_iter(
                 f"builds:{repo.name}:{repo.target_ref}", match="status",
             )
@@ -126,46 +144,19 @@ def add_changed_repos_to_queue(
 
 
 def loop():
-    redis_waiting_for = 0
-    db_waiting_for = 0
+    server_waiting_for = 0
 
     while True:
         logger.info("Attempting to poll and queue builds")
-        cont = False
         try:
-            db_conn = psycopg2.connect(settings.postgres_dsn)
-        except psycopg2.Error:
-            logger.debug("Failed to connect to db", exc_info=True)
-            if db_waiting_for > settings.db_timeout:
-                logger.error(
-                    "Connection to Postgresql (%s) timed out after %d seconds",
-                    settings.postgres_dsn,
-                    settings.db_timeout,
-                )
+            channel = grpc.insecure_channel(f"{settings.sid_server_dsn.host}:{settings.sid_server_dsn.port}")
+            stub = sid_pb2_grpc.SidStub(channel)
+        except grpc.RpcError:
+            logger.debug("Failed to connect to server", exc_info=True)
+            if server_waiting_for > settings.sid_server_timeout:
+                logger.error("Connection to sid server (%s) timed out after %d seconds", settings.sid_server_dsn, settings.sid_server_timeout)
                 break
-            db_waiting_for += 1
-            cont = True
-        try:
-            redis_conn = redis.Redis(
-                host=settings.redis_dsn.host,
-                port=settings.redis_dsn.port,
-                db=settings.redis_dsn.path,
-                password=settings.redis_dsn.password,
-            )
-        except redis.ConnectionError:
-            logger.debug("Failed to connect to db", exc_info=True)
-            if redis_waiting_for > settings.redis_timeout:
-                logger.error(
-                    "Connection to Redis (%s) timed out after %d seconds",
-                    settings.redis_dsn,
-                    settings.redis_timeout,
-                )
-                break
-            redis_waiting_for += 1
-            cont = True
-        if cont:
             time.sleep(1)
-            continue
         logger.info("Getting enabled repos")
         enabled_repos = get_enabled_repositories(db_conn)
         logger.info(
