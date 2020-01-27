@@ -24,6 +24,11 @@ class SidStub(object):
         request_serializer=sid__pb2.Job.SerializeToString,
         response_deserializer=sid__pb2.Job.FromString,
         )
+    self.Login = channel.unary_unary(
+        '/sid.Sid/Login',
+        request_serializer=sid__pb2.LoginRequest.SerializeToString,
+        response_deserializer=sid__pb2.Token.FromString,
+        )
     self.HealthStatusCheckIn = channel.stream_unary(
         '/sid.Sid/HealthStatusCheckIn',
         request_serializer=sid__pb2.HealthStatus.SerializeToString,
@@ -49,6 +54,13 @@ class SidServicer(object):
 
   def AddJob(self, request, context):
     """Adds a job to the queue
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def Login(self, request, context):
+    """Log in
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -85,6 +97,11 @@ def add_SidServicer_to_server(servicer, server):
           servicer.AddJob,
           request_deserializer=sid__pb2.Job.FromString,
           response_serializer=sid__pb2.Job.SerializeToString,
+      ),
+      'Login': grpc.unary_unary_rpc_method_handler(
+          servicer.Login,
+          request_deserializer=sid__pb2.LoginRequest.FromString,
+          response_serializer=sid__pb2.Token.SerializeToString,
       ),
       'HealthStatusCheckIn': grpc.stream_unary_rpc_method_handler(
           servicer.HealthStatusCheckIn,
