@@ -53,7 +53,7 @@ func (x HealthStatus_Status) String() string {
 }
 
 func (HealthStatus_Status) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_923cdea5d0e24e4a, []int{0, 0}
+	return fileDescriptor_923cdea5d0e24e4a, []int{2, 0}
 }
 
 type Job_JobStatus int32
@@ -63,6 +63,7 @@ const (
 	Job_BUILDING  Job_JobStatus = 1
 	Job_ABANDONED Job_JobStatus = 2
 	Job_COMPLETED Job_JobStatus = 3
+	Job_FAILED    Job_JobStatus = 5
 )
 
 var Job_JobStatus_name = map[int32]string{
@@ -70,6 +71,7 @@ var Job_JobStatus_name = map[int32]string{
 	1: "BUILDING",
 	2: "ABANDONED",
 	3: "COMPLETED",
+	5: "FAILED",
 }
 
 var Job_JobStatus_value = map[string]int32{
@@ -77,6 +79,7 @@ var Job_JobStatus_value = map[string]int32{
 	"BUILDING":  1,
 	"ABANDONED": 2,
 	"COMPLETED": 3,
+	"FAILED":    5,
 }
 
 func (x Job_JobStatus) String() string {
@@ -84,7 +87,7 @@ func (x Job_JobStatus) String() string {
 }
 
 func (Job_JobStatus) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_923cdea5d0e24e4a, []int{1, 0}
+	return fileDescriptor_923cdea5d0e24e4a, []int{3, 0}
 }
 
 type JobRunEvent_EventType int32
@@ -109,7 +112,94 @@ func (x JobRunEvent_EventType) String() string {
 }
 
 func (JobRunEvent_EventType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_923cdea5d0e24e4a, []int{2, 0}
+	return fileDescriptor_923cdea5d0e24e4a, []int{4, 0}
+}
+
+type Token struct {
+	Token                string   `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Token) Reset()         { *m = Token{} }
+func (m *Token) String() string { return proto.CompactTextString(m) }
+func (*Token) ProtoMessage()    {}
+func (*Token) Descriptor() ([]byte, []int) {
+	return fileDescriptor_923cdea5d0e24e4a, []int{0}
+}
+
+func (m *Token) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Token.Unmarshal(m, b)
+}
+func (m *Token) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Token.Marshal(b, m, deterministic)
+}
+func (m *Token) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Token.Merge(m, src)
+}
+func (m *Token) XXX_Size() int {
+	return xxx_messageInfo_Token.Size(m)
+}
+func (m *Token) XXX_DiscardUnknown() {
+	xxx_messageInfo_Token.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Token proto.InternalMessageInfo
+
+func (m *Token) GetToken() string {
+	if m != nil {
+		return m.Token
+	}
+	return ""
+}
+
+// Login Request
+type LoginRequest struct {
+	Identifier           string   `protobuf:"bytes,1,opt,name=identifier,proto3" json:"identifier,omitempty"`
+	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *LoginRequest) Reset()         { *m = LoginRequest{} }
+func (m *LoginRequest) String() string { return proto.CompactTextString(m) }
+func (*LoginRequest) ProtoMessage()    {}
+func (*LoginRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_923cdea5d0e24e4a, []int{1}
+}
+
+func (m *LoginRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_LoginRequest.Unmarshal(m, b)
+}
+func (m *LoginRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_LoginRequest.Marshal(b, m, deterministic)
+}
+func (m *LoginRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_LoginRequest.Merge(m, src)
+}
+func (m *LoginRequest) XXX_Size() int {
+	return xxx_messageInfo_LoginRequest.Size(m)
+}
+func (m *LoginRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_LoginRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_LoginRequest proto.InternalMessageInfo
+
+func (m *LoginRequest) GetIdentifier() string {
+	if m != nil {
+		return m.Identifier
+	}
+	return ""
+}
+
+func (m *LoginRequest) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
 }
 
 // HealthStatus
@@ -125,7 +215,7 @@ func (m *HealthStatus) Reset()         { *m = HealthStatus{} }
 func (m *HealthStatus) String() string { return proto.CompactTextString(m) }
 func (*HealthStatus) ProtoMessage()    {}
 func (*HealthStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_923cdea5d0e24e4a, []int{0}
+	return fileDescriptor_923cdea5d0e24e4a, []int{2}
 }
 
 func (m *HealthStatus) XXX_Unmarshal(b []byte) error {
@@ -166,6 +256,7 @@ type Job struct {
 	CommitHexsha         string               `protobuf:"bytes,3,opt,name=commit_hexsha,json=commitHexsha,proto3" json:"commit_hexsha,omitempty"`
 	JobStatus            Job_JobStatus        `protobuf:"varint,4,opt,name=job_status,json=jobStatus,proto3,enum=sid.Job_JobStatus" json:"job_status,omitempty"`
 	StatusAt             *timestamp.Timestamp `protobuf:"bytes,5,opt,name=status_at,json=statusAt,proto3" json:"status_at,omitempty"`
+	JobUuid              string               `protobuf:"bytes,6,opt,name=job_uuid,json=jobUuid,proto3" json:"job_uuid,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
 	XXX_sizecache        int32                `json:"-"`
@@ -175,7 +266,7 @@ func (m *Job) Reset()         { *m = Job{} }
 func (m *Job) String() string { return proto.CompactTextString(m) }
 func (*Job) ProtoMessage()    {}
 func (*Job) Descriptor() ([]byte, []int) {
-	return fileDescriptor_923cdea5d0e24e4a, []int{1}
+	return fileDescriptor_923cdea5d0e24e4a, []int{3}
 }
 
 func (m *Job) XXX_Unmarshal(b []byte) error {
@@ -231,10 +322,18 @@ func (m *Job) GetStatusAt() *timestamp.Timestamp {
 	return nil
 }
 
+func (m *Job) GetJobUuid() string {
+	if m != nil {
+		return m.JobUuid
+	}
+	return ""
+}
+
 type JobRunEvent struct {
 	Type                 JobRunEvent_EventType `protobuf:"varint,1,opt,name=type,proto3,enum=sid.JobRunEvent_EventType" json:"type,omitempty"`
 	Content              string                `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
 	EventAt              *timestamp.Timestamp  `protobuf:"bytes,3,opt,name=event_at,json=eventAt,proto3" json:"event_at,omitempty"`
+	Job                  *Job                  `protobuf:"bytes,4,opt,name=job,proto3" json:"job,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_unrecognized     []byte                `json:"-"`
 	XXX_sizecache        int32                 `json:"-"`
@@ -244,7 +343,7 @@ func (m *JobRunEvent) Reset()         { *m = JobRunEvent{} }
 func (m *JobRunEvent) String() string { return proto.CompactTextString(m) }
 func (*JobRunEvent) ProtoMessage()    {}
 func (*JobRunEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_923cdea5d0e24e4a, []int{2}
+	return fileDescriptor_923cdea5d0e24e4a, []int{4}
 }
 
 func (m *JobRunEvent) XXX_Unmarshal(b []byte) error {
@@ -286,6 +385,13 @@ func (m *JobRunEvent) GetEventAt() *timestamp.Timestamp {
 	return nil
 }
 
+func (m *JobRunEvent) GetJob() *Job {
+	if m != nil {
+		return m.Job
+	}
+	return nil
+}
+
 type CheckInResponse struct {
 	Response             string   `protobuf:"bytes,1,opt,name=response,proto3" json:"response,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -297,7 +403,7 @@ func (m *CheckInResponse) Reset()         { *m = CheckInResponse{} }
 func (m *CheckInResponse) String() string { return proto.CompactTextString(m) }
 func (*CheckInResponse) ProtoMessage()    {}
 func (*CheckInResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_923cdea5d0e24e4a, []int{3}
+	return fileDescriptor_923cdea5d0e24e4a, []int{5}
 }
 
 func (m *CheckInResponse) XXX_Unmarshal(b []byte) error {
@@ -329,6 +435,8 @@ func init() {
 	proto.RegisterEnum("sid.HealthStatus_Status", HealthStatus_Status_name, HealthStatus_Status_value)
 	proto.RegisterEnum("sid.Job_JobStatus", Job_JobStatus_name, Job_JobStatus_value)
 	proto.RegisterEnum("sid.JobRunEvent_EventType", JobRunEvent_EventType_name, JobRunEvent_EventType_value)
+	proto.RegisterType((*Token)(nil), "sid.Token")
+	proto.RegisterType((*LoginRequest)(nil), "sid.LoginRequest")
 	proto.RegisterType((*HealthStatus)(nil), "sid.HealthStatus")
 	proto.RegisterType((*Job)(nil), "sid.Job")
 	proto.RegisterType((*JobRunEvent)(nil), "sid.JobRunEvent")
@@ -338,41 +446,48 @@ func init() {
 func init() { proto.RegisterFile("sid.proto", fileDescriptor_923cdea5d0e24e4a) }
 
 var fileDescriptor_923cdea5d0e24e4a = []byte{
-	// 529 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x52, 0x41, 0x6f, 0xd3, 0x4c,
-	0x10, 0xcd, 0xc6, 0x6d, 0x62, 0x4f, 0xd2, 0xef, 0x33, 0x0b, 0x87, 0x28, 0x1c, 0x88, 0xdc, 0x03,
-	0xb9, 0xe0, 0x96, 0x20, 0xc4, 0x81, 0x93, 0x13, 0x5b, 0x69, 0x42, 0x70, 0x60, 0x93, 0x14, 0x71,
-	0xb2, 0xec, 0x64, 0xa9, 0x53, 0x62, 0xaf, 0xe5, 0xdd, 0x20, 0xfa, 0x57, 0x38, 0xf2, 0x17, 0x90,
-	0xf8, 0x7d, 0x68, 0xd7, 0x76, 0x09, 0x05, 0x09, 0x71, 0xb0, 0x3d, 0xf3, 0xe6, 0x79, 0xdf, 0xcc,
-	0x9b, 0x05, 0x83, 0x6f, 0x37, 0x76, 0x96, 0x33, 0xc1, 0xb0, 0xc6, 0xb7, 0x9b, 0xee, 0xa3, 0x2b,
-	0xc6, 0xae, 0x76, 0xf4, 0x4c, 0x41, 0xd1, 0xfe, 0xc3, 0x99, 0xd8, 0x26, 0x94, 0x8b, 0x30, 0xc9,
-	0x0a, 0x96, 0xf5, 0x1d, 0x41, 0xfb, 0x82, 0x86, 0x3b, 0x11, 0x2f, 0x44, 0x28, 0xf6, 0x1c, 0x9f,
-	0x43, 0x83, 0xab, 0xa8, 0x83, 0x7a, 0xa8, 0xff, 0xdf, 0xa0, 0x63, 0xcb, 0x23, 0x0f, 0x29, 0x76,
-	0xf1, 0x21, 0x25, 0x0f, 0xbf, 0x00, 0xa3, 0x88, 0x82, 0x50, 0x74, 0xea, 0x3d, 0xd4, 0x6f, 0x0d,
-	0xba, 0x76, 0xa1, 0x6b, 0x57, 0xba, 0xf6, 0xb2, 0xd2, 0x25, 0x7a, 0x41, 0x76, 0x84, 0xf5, 0x12,
-	0x1a, 0xa5, 0x68, 0x1b, 0xf4, 0x89, 0xef, 0x8c, 0x96, 0x93, 0x4b, 0xcf, 0xac, 0x61, 0x03, 0x8e,
-	0x89, 0xe7, 0xb8, 0xef, 0x4d, 0x84, 0x5b, 0xd0, 0x7c, 0x37, 0x27, 0xaf, 0x26, 0xfe, 0xd8, 0xac,
-	0xcb, 0x64, 0xe6, 0x39, 0x97, 0x32, 0xd1, 0xac, 0x2f, 0x75, 0xd0, 0xa6, 0x2c, 0xc2, 0x0f, 0xc1,
-	0xc8, 0x69, 0xc6, 0x82, 0x34, 0x4c, 0xa8, 0x6a, 0xd9, 0x20, 0xba, 0x04, 0xfc, 0x30, 0xa1, 0xb8,
-	0x07, 0x6d, 0x55, 0xe4, 0x3c, 0x0e, 0xf6, 0xf9, 0x4e, 0x75, 0x67, 0x10, 0x90, 0xd8, 0x82, 0xc7,
-	0xab, 0x7c, 0x87, 0x4f, 0xe1, 0x64, 0xcd, 0x92, 0x64, 0x2b, 0x82, 0x98, 0x7e, 0xe6, 0x71, 0xd8,
-	0xd1, 0x14, 0xa5, 0x5d, 0x80, 0x17, 0x0a, 0xc3, 0x4f, 0x01, 0xae, 0x59, 0x14, 0x94, 0xbe, 0x1c,
-	0x29, 0x5f, 0xb0, 0xf2, 0x65, 0xca, 0x22, 0xf9, 0x94, 0x8e, 0x18, 0xd7, 0x55, 0xf8, 0xab, 0x29,
-	0xc7, 0xff, 0x60, 0xca, 0x08, 0x8c, 0xdb, 0x03, 0x31, 0x40, 0xe3, 0xed, 0xca, 0x5b, 0x79, 0xae,
-	0x59, 0x93, 0x1e, 0x0d, 0x57, 0x93, 0x99, 0x2b, 0xc7, 0x47, 0xf8, 0x04, 0x0c, 0x67, 0xe8, 0xf8,
-	0xee, 0xdc, 0xf7, 0x5c, 0xb3, 0x2e, 0xd3, 0xd1, 0xfc, 0xf5, 0x9b, 0x99, 0xb7, 0xf4, 0x5c, 0x53,
-	0xb3, 0xbe, 0x21, 0x68, 0x4d, 0x59, 0x44, 0xf6, 0xa9, 0xf7, 0x89, 0xa6, 0x02, 0xdb, 0x70, 0x24,
-	0x6e, 0x32, 0x5a, 0xae, 0xb4, 0x5b, 0xb5, 0x5e, 0xd5, 0x6d, 0xf5, 0x5e, 0xde, 0x64, 0x94, 0x28,
-	0x1e, 0xee, 0x40, 0x73, 0xcd, 0x52, 0x41, 0x53, 0x51, 0x5a, 0x56, 0xa5, 0xf8, 0x39, 0xe8, 0x54,
-	0x92, 0xe5, 0x58, 0xda, 0x5f, 0xc7, 0x6a, 0x2a, 0xae, 0x23, 0xac, 0x53, 0x30, 0x6e, 0x35, 0xe4,
-	0x1e, 0xc9, 0xca, 0x0f, 0x66, 0xf3, 0x71, 0xb1, 0x6c, 0x8f, 0x90, 0x39, 0x31, 0x91, 0xf5, 0x04,
-	0xfe, 0x1f, 0xc5, 0x74, 0xfd, 0x71, 0x92, 0x12, 0xca, 0x33, 0x96, 0x72, 0x8a, 0xbb, 0xa0, 0xe7,
-	0x65, 0xfc, 0x73, 0xb9, 0x45, 0x3e, 0xf8, 0x8a, 0x40, 0x5b, 0x6c, 0x37, 0xf8, 0x31, 0x34, 0xc6,
-	0x54, 0xc8, 0xbb, 0x70, 0xef, 0xb7, 0xbb, 0xda, 0xd5, 0xab, 0x59, 0xad, 0x1a, 0x1e, 0xc2, 0xfd,
-	0xc3, 0x5a, 0xa9, 0xf5, 0xa7, 0xbf, 0x1e, 0x28, 0xe8, 0x4e, 0x33, 0x56, 0xed, 0x1c, 0x61, 0x1b,
-	0xda, 0x84, 0xae, 0x59, 0xbe, 0x29, 0xec, 0xc3, 0xe6, 0x5d, 0x2f, 0x0f, 0x15, 0xfb, 0x28, 0x6a,
-	0x28, 0x57, 0x9e, 0xfd, 0x08, 0x00, 0x00, 0xff, 0xff, 0x58, 0xee, 0x4b, 0x9b, 0x99, 0x03, 0x00,
-	0x00,
+	// 648 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0xd1, 0x72, 0xd2, 0x4c,
+	0x14, 0x26, 0xa4, 0x84, 0xe4, 0x40, 0xff, 0x3f, 0xae, 0xbd, 0xc0, 0x38, 0xd6, 0x4e, 0x7a, 0x21,
+	0x37, 0xa6, 0x8a, 0xe3, 0x78, 0xe1, 0x55, 0xda, 0xc4, 0x16, 0x44, 0xd0, 0x2d, 0xd4, 0xf1, 0x8a,
+	0x49, 0xc8, 0x16, 0x42, 0x21, 0x1b, 0xb3, 0x1b, 0xb5, 0x2f, 0xe6, 0xbd, 0x4f, 0xe0, 0x8b, 0xf8,
+	0x10, 0xce, 0x6e, 0x02, 0xd2, 0xea, 0x8c, 0x5e, 0x00, 0xe7, 0x7c, 0xe7, 0x63, 0xcf, 0xf9, 0xbe,
+	0x3d, 0x0b, 0x06, 0x8b, 0x23, 0x27, 0xcd, 0x28, 0xa7, 0x48, 0x65, 0x71, 0x64, 0x3d, 0x9c, 0x51,
+	0x3a, 0x5b, 0x92, 0x23, 0x09, 0x85, 0xf9, 0xe5, 0x11, 0x8f, 0x57, 0x84, 0xf1, 0x60, 0x95, 0x16,
+	0x2c, 0xfb, 0x01, 0xd4, 0x46, 0xf4, 0x8a, 0x24, 0x68, 0x0f, 0x6a, 0x5c, 0x04, 0x2d, 0xe5, 0x40,
+	0x69, 0x1b, 0xb8, 0x48, 0xec, 0x1e, 0x34, 0xfb, 0x74, 0x16, 0x27, 0x98, 0x7c, 0xcc, 0x09, 0xe3,
+	0x68, 0x1f, 0x20, 0x8e, 0x48, 0xc2, 0xe3, 0xcb, 0x98, 0x64, 0x25, 0x75, 0x0b, 0x41, 0x16, 0xe8,
+	0x69, 0xc0, 0xd8, 0x67, 0x9a, 0x45, 0xad, 0xaa, 0xac, 0x6e, 0x72, 0xfb, 0xab, 0x02, 0xcd, 0x33,
+	0x12, 0x2c, 0xf9, 0xfc, 0x9c, 0x07, 0x3c, 0x67, 0xe8, 0x09, 0x68, 0x4c, 0x46, 0xf2, 0xa0, 0xff,
+	0x3a, 0x2d, 0x47, 0x4c, 0xbf, 0x4d, 0x71, 0x8a, 0x1f, 0x5c, 0xf2, 0xd0, 0x0b, 0x30, 0x8a, 0x68,
+	0x12, 0x70, 0x79, 0x7e, 0xa3, 0x63, 0x39, 0x85, 0x44, 0x67, 0x2d, 0xd1, 0x19, 0xad, 0x25, 0x62,
+	0xbd, 0x20, 0xbb, 0xdc, 0x7e, 0x09, 0x5a, 0xd9, 0xb4, 0x09, 0x7a, 0x77, 0xe0, 0x9e, 0x8c, 0xba,
+	0x17, 0xbe, 0x59, 0x41, 0x06, 0xd4, 0xb0, 0xef, 0x7a, 0x1f, 0x4c, 0x05, 0x35, 0xa0, 0xfe, 0x7e,
+	0x88, 0x5f, 0x77, 0x07, 0xa7, 0x66, 0x55, 0x24, 0x7d, 0xdf, 0xbd, 0x10, 0x89, 0x6a, 0x7f, 0xab,
+	0x82, 0xda, 0xa3, 0x21, 0xba, 0x0f, 0x46, 0x46, 0x52, 0x3a, 0x49, 0x82, 0x15, 0x29, 0xb5, 0xeb,
+	0x02, 0x18, 0x04, 0x2b, 0x82, 0x0e, 0xa0, 0x29, 0x8b, 0x8c, 0xcd, 0x27, 0x79, 0xb6, 0x2c, 0xd5,
+	0x83, 0xc0, 0xce, 0xd9, 0x7c, 0x9c, 0x2d, 0xd1, 0x21, 0xec, 0x4e, 0xe9, 0x6a, 0x15, 0xf3, 0xc9,
+	0x9c, 0x7c, 0x61, 0xf3, 0xa0, 0xa5, 0x4a, 0x4a, 0xb3, 0x00, 0xcf, 0x24, 0x86, 0x9e, 0x02, 0x2c,
+	0x68, 0x38, 0x29, 0x7d, 0xd9, 0x91, 0xbe, 0x20, 0xe9, 0x4b, 0x8f, 0x86, 0xe2, 0x53, 0x3a, 0x62,
+	0x2c, 0xd6, 0xe1, 0x4d, 0x53, 0x6a, 0xff, 0x6e, 0x0a, 0xba, 0x07, 0xba, 0xe8, 0x95, 0xe7, 0x71,
+	0xd4, 0xd2, 0xe4, 0x2c, 0xf5, 0x05, 0x0d, 0xc7, 0x79, 0x1c, 0xd9, 0x43, 0x30, 0x36, 0xbd, 0x10,
+	0x80, 0xf6, 0x6e, 0xec, 0x8f, 0x7d, 0xcf, 0xac, 0x08, 0xfb, 0x8e, 0xc7, 0xdd, 0xbe, 0x27, 0x9c,
+	0x51, 0xd0, 0x2e, 0x18, 0xee, 0xb1, 0x3b, 0xf0, 0x86, 0x03, 0xdf, 0x33, 0xab, 0x22, 0x3d, 0x19,
+	0xbe, 0x79, 0xdb, 0xf7, 0x47, 0xbe, 0x67, 0xaa, 0xe2, 0x7f, 0xaf, 0xdc, 0x6e, 0xdf, 0xf7, 0xcc,
+	0x9a, 0xfd, 0x5d, 0x81, 0x46, 0x8f, 0x86, 0x38, 0x4f, 0xfc, 0x4f, 0x24, 0xe1, 0xc8, 0x81, 0x1d,
+	0x7e, 0x9d, 0x92, 0xf2, 0xe6, 0xad, 0xb5, 0xc2, 0x75, 0xdd, 0x91, 0xdf, 0xa3, 0xeb, 0x94, 0x60,
+	0xc9, 0x43, 0x2d, 0xa8, 0x4f, 0x69, 0xc2, 0x49, 0xc2, 0x4b, 0x67, 0xd7, 0x29, 0x7a, 0x0e, 0x3a,
+	0x11, 0x64, 0xa1, 0x5e, 0xfd, 0xab, 0xfa, 0xba, 0xe4, 0xba, 0x1c, 0x59, 0xa0, 0x2e, 0x68, 0x28,
+	0x1d, 0x6e, 0x74, 0xf4, 0x4d, 0x7f, 0x01, 0xda, 0x87, 0x60, 0x6c, 0xfa, 0x8b, 0x55, 0xc0, 0xe3,
+	0xc1, 0xa4, 0x3f, 0x3c, 0x2d, 0xf6, 0xc5, 0xc7, 0x78, 0x88, 0x4d, 0xc5, 0x7e, 0x0c, 0xff, 0x9f,
+	0xcc, 0xc9, 0xf4, 0xaa, 0x9b, 0x60, 0xc2, 0x52, 0x9a, 0x30, 0x22, 0xb6, 0x3f, 0x2b, 0xe3, 0x5f,
+	0xfb, 0x51, 0xe4, 0x9d, 0x1f, 0x0a, 0xa8, 0xe7, 0x71, 0x84, 0x1e, 0x81, 0x76, 0x4a, 0xb8, 0x58,
+	0xa7, 0x3b, 0xbf, 0xad, 0xbb, 0xb5, 0x99, 0xc3, 0xae, 0xa0, 0x7d, 0xd0, 0xdc, 0x28, 0x12, 0xc4,
+	0x0d, 0x7a, 0xa3, 0xde, 0x86, 0x9a, 0x7c, 0x9a, 0xe5, 0x39, 0xdb, 0xcf, 0xd4, 0x02, 0x09, 0xc9,
+	0x87, 0x6d, 0x57, 0xd0, 0x31, 0xdc, 0xdd, 0xee, 0x52, 0x4e, 0xfd, 0xa7, 0xfe, 0x7b, 0x12, 0xba,
+	0x25, 0xcb, 0xae, 0xb4, 0x15, 0xe4, 0x40, 0x13, 0x93, 0x29, 0xcd, 0xa2, 0xe2, 0x92, 0x90, 0x79,
+	0xfb, 0xc6, 0xb6, 0x67, 0x6b, 0x2b, 0xa1, 0x26, 0xbd, 0x7f, 0xf6, 0x33, 0x00, 0x00, 0xff, 0xff,
+	0x9c, 0x4b, 0x28, 0x4e, 0x91, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -387,17 +502,16 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type SidClient interface {
-	// A simple RPC.
-	//
-	// Obtains the feature at a given position.
-	//
-	// A feature with an empty name is returned if there's no feature at the given
-	// position.
+	// Obtains a job from the queue
 	GetJob(ctx context.Context, in *HealthStatus, opts ...grpc.CallOption) (*Job, error)
-	// A server-to-client streaming RPC.
+	// Adds a job to the queue
+	AddJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (*Job, error)
+	// Log in
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*Token, error)
+	// A client-to-server streaming RPC.
 	//
 	// Streams health status of the client as it changes.
-	HealthStatusCheckIn(ctx context.Context, in *HealthStatus, opts ...grpc.CallOption) (Sid_HealthStatusCheckInClient, error)
+	HealthStatusCheckIn(ctx context.Context, opts ...grpc.CallOption) (Sid_HealthStatusCheckInClient, error)
 	// A client-to-server streaming RPC.
 	//
 	// Accepts a stream of JobRunEvents on a job being run, returning a
@@ -422,23 +536,36 @@ func (c *sidClient) GetJob(ctx context.Context, in *HealthStatus, opts ...grpc.C
 	return out, nil
 }
 
-func (c *sidClient) HealthStatusCheckIn(ctx context.Context, in *HealthStatus, opts ...grpc.CallOption) (Sid_HealthStatusCheckInClient, error) {
+func (c *sidClient) AddJob(ctx context.Context, in *Job, opts ...grpc.CallOption) (*Job, error) {
+	out := new(Job)
+	err := c.cc.Invoke(ctx, "/sid.Sid/AddJob", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sidClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*Token, error) {
+	out := new(Token)
+	err := c.cc.Invoke(ctx, "/sid.Sid/Login", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sidClient) HealthStatusCheckIn(ctx context.Context, opts ...grpc.CallOption) (Sid_HealthStatusCheckInClient, error) {
 	stream, err := c.cc.NewStream(ctx, &_Sid_serviceDesc.Streams[0], "/sid.Sid/HealthStatusCheckIn", opts...)
 	if err != nil {
 		return nil, err
 	}
 	x := &sidHealthStatusCheckInClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
 	return x, nil
 }
 
 type Sid_HealthStatusCheckInClient interface {
-	Recv() (*CheckInResponse, error)
+	Send(*HealthStatus) error
+	CloseAndRecv() (*CheckInResponse, error)
 	grpc.ClientStream
 }
 
@@ -446,7 +573,14 @@ type sidHealthStatusCheckInClient struct {
 	grpc.ClientStream
 }
 
-func (x *sidHealthStatusCheckInClient) Recv() (*CheckInResponse, error) {
+func (x *sidHealthStatusCheckInClient) Send(m *HealthStatus) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *sidHealthStatusCheckInClient) CloseAndRecv() (*CheckInResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
 	m := new(CheckInResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -490,17 +624,16 @@ func (x *sidRecordJobRunClient) CloseAndRecv() (*Job, error) {
 
 // SidServer is the server API for Sid service.
 type SidServer interface {
-	// A simple RPC.
-	//
-	// Obtains the feature at a given position.
-	//
-	// A feature with an empty name is returned if there's no feature at the given
-	// position.
+	// Obtains a job from the queue
 	GetJob(context.Context, *HealthStatus) (*Job, error)
-	// A server-to-client streaming RPC.
+	// Adds a job to the queue
+	AddJob(context.Context, *Job) (*Job, error)
+	// Log in
+	Login(context.Context, *LoginRequest) (*Token, error)
+	// A client-to-server streaming RPC.
 	//
 	// Streams health status of the client as it changes.
-	HealthStatusCheckIn(*HealthStatus, Sid_HealthStatusCheckInServer) error
+	HealthStatusCheckIn(Sid_HealthStatusCheckInServer) error
 	// A client-to-server streaming RPC.
 	//
 	// Accepts a stream of JobRunEvents on a job being run, returning a
@@ -515,7 +648,13 @@ type UnimplementedSidServer struct {
 func (*UnimplementedSidServer) GetJob(ctx context.Context, req *HealthStatus) (*Job, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetJob not implemented")
 }
-func (*UnimplementedSidServer) HealthStatusCheckIn(req *HealthStatus, srv Sid_HealthStatusCheckInServer) error {
+func (*UnimplementedSidServer) AddJob(ctx context.Context, req *Job) (*Job, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddJob not implemented")
+}
+func (*UnimplementedSidServer) Login(ctx context.Context, req *LoginRequest) (*Token, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (*UnimplementedSidServer) HealthStatusCheckIn(srv Sid_HealthStatusCheckInServer) error {
 	return status.Errorf(codes.Unimplemented, "method HealthStatusCheckIn not implemented")
 }
 func (*UnimplementedSidServer) RecordJobRun(srv Sid_RecordJobRunServer) error {
@@ -544,16 +683,49 @@ func _Sid_GetJob_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Sid_HealthStatusCheckIn_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(HealthStatus)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _Sid_AddJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Job)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(SidServer).HealthStatusCheckIn(m, &sidHealthStatusCheckInServer{stream})
+	if interceptor == nil {
+		return srv.(SidServer).AddJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sid.Sid/AddJob",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SidServer).AddJob(ctx, req.(*Job))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Sid_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SidServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sid.Sid/Login",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SidServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Sid_HealthStatusCheckIn_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(SidServer).HealthStatusCheckIn(&sidHealthStatusCheckInServer{stream})
 }
 
 type Sid_HealthStatusCheckInServer interface {
-	Send(*CheckInResponse) error
+	SendAndClose(*CheckInResponse) error
+	Recv() (*HealthStatus, error)
 	grpc.ServerStream
 }
 
@@ -561,8 +733,16 @@ type sidHealthStatusCheckInServer struct {
 	grpc.ServerStream
 }
 
-func (x *sidHealthStatusCheckInServer) Send(m *CheckInResponse) error {
+func (x *sidHealthStatusCheckInServer) SendAndClose(m *CheckInResponse) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func (x *sidHealthStatusCheckInServer) Recv() (*HealthStatus, error) {
+	m := new(HealthStatus)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func _Sid_RecordJobRun_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -599,12 +779,20 @@ var _Sid_serviceDesc = grpc.ServiceDesc{
 			MethodName: "GetJob",
 			Handler:    _Sid_GetJob_Handler,
 		},
+		{
+			MethodName: "AddJob",
+			Handler:    _Sid_AddJob_Handler,
+		},
+		{
+			MethodName: "Login",
+			Handler:    _Sid_Login_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "HealthStatusCheckIn",
 			Handler:       _Sid_HealthStatusCheckIn_Handler,
-			ServerStreams: true,
+			ClientStreams: true,
 		},
 		{
 			StreamName:    "RecordJobRun",
