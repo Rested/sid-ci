@@ -20,7 +20,7 @@ services:
       - fake-git-server
       - redis
     volumes:
-      - ./fake_git_agent/server/keys/id_rsa:/config/id_rsa
+      - ./fake_git_agent/server/fake_keys/id_rsa:/config/id_rsa
   db:
     image: postgres:11.6
     volumes:
@@ -33,7 +33,7 @@ services:
   fake-git-server:
     build: fake_git_agent/server
     volumes:
-       - ./fake_git_agent/server/keys/id_rsa.pub:/git-server/keys/id_rsa.pub 
+       - ./fake_git_agent/server/fake_keys/id_rsa.pub:/git-server/fake_keys/id_rsa.pub
   dev-bot:
     environment:
       - GIT_DISCOVERY_ACROSS_FILESYSTEM=1

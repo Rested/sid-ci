@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-agent
+  labels:
+    app: git-agent
+spec:
+  selector:
+    matchLabels:
+      app: git-agent
+  template:
+    metadata:
+      labels:
+        app: git-agent
+    spec:
+      containers:
+        - name: git-agent
+          image: git-agent
+          env:
+            - name: GIT_DISCOVERY_ACROSS_FILESYSTEM
+              value: 1

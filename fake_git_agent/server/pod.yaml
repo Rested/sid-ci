@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-server
+  labels:
+    app: git-server
+spec:
+  selector:
+    matchLabels:
+      app: git-server
+  template:
+    metadata:
+      labels:
+        app: git-server
+    spec:
+      containers:
+        - name: git-server
+          image: git-server
+          ports:
+            - containerPort: 22
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: git-server
+spec:
+  selector:
+    app: git-server
+  ports:
+    - protocol: TCP
+      port: 22
+      targetPort: 22

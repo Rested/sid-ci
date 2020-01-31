@@ -17,7 +17,7 @@ service Sid {
     // Log in
     rpc Login (LoginRequest) returns (Token) {
     }
-
+    rpc ChangePass (LoginRequest) returns (Token) {}
     // A client-to-server streaming RPC.
     //
     // Streams health status of the client as it changes.
@@ -34,12 +34,14 @@ service Sid {
 
 message Token {
     string token = 1;
+    google.protobuf.Timestamp expires_at = 2;
 }
 
 // Login Request
 message LoginRequest {
     string identifier = 1;
     string password = 2;
+    string new_password = 3; // for password changes
 }
 
 // HealthStatus

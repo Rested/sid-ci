@@ -1,0 +1,47 @@
+apiVersion: skaffold/v1beta15
+kind: Config
+metadata:
+  name: sid-ci
+build:
+  artifacts:
+  - image: db
+    context: db
+  - image: server
+    context: server
+    docker:
+      dockerfile: Dockerfile
+#  local:
+#    push: false
+deploy:
+  kubectl:
+    manifests:
+    - db/pod.yaml
+    - server/pod.yaml
+
+profiles:
+  - name: debug
+    build:
+      artifacts:
+        - image: db
+          context: db
+        - image: server
+          context: server
+          docker:
+            dockerfile: Dockerfile_debug
+        - image: fake_git_agent/server
+          context: fake_git_agent/server
+          docker:
+            dockerfile: Dockerfile
+            noCache: false
+        - image: git-agent
+          context: fake_git_agent
+        - image: daemon
+          context: daemon
+    deploy:
+      kubectl:
+          manifests:
+            - db/pod.yaml
+            - server/pod.yaml
+            - fake_git_agent/server/pod.yaml
+            - fake_git_agent/pod.yaml
+            - daemon/pod.yaml

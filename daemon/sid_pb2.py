@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='sid',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\tsid.proto\x12\x03sid\x1a\x1fgoogle/protobuf/timestamp.proto\"\x16\n\x05Token\x12\r\n\x05token\x18\x01 \x01(\t\"4\n\x0cLoginRequest\x12\x12\n\nidentifier\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"\xa4\x01\n\x0cHealthStatus\x12(\n\x06status\x18\x01 \x01(\x0e\x32\x18.sid.HealthStatus.Status\x12-\n\tstatus_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\";\n\x06Status\x12\x0c\n\x08INACTIVE\x10\x00\x12\t\n\x05READY\x10\x01\x12\x0b\n\x07WORKING\x10\x02\x12\x0b\n\x07LEAVING\x10\x03\"\xff\x01\n\x03Job\x12\x11\n\trepo_name\x18\x01 \x01(\t\x12\x14\n\x0crepo_ssh_url\x18\x02 \x01(\t\x12\x15\n\rcommit_hexsha\x18\x03 \x01(\t\x12&\n\njob_status\x18\x04 \x01(\x0e\x32\x12.sid.Job.JobStatus\x12-\n\tstatus_at\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x10\n\x08job_uuid\x18\x06 \x01(\t\"O\n\tJobStatus\x12\n\n\x06QUEUED\x10\x00\x12\x0c\n\x08\x42UILDING\x10\x01\x12\r\n\tABANDONED\x10\x02\x12\r\n\tCOMPLETED\x10\x03\x12\n\n\x06\x46\x41ILED\x10\x05\"\xb2\x01\n\x0bJobRunEvent\x12(\n\x04type\x18\x01 \x01(\x0e\x32\x1a.sid.JobRunEvent.EventType\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\x12,\n\x08\x65vent_at\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x15\n\x03job\x18\x04 \x01(\x0b\x32\x08.sid.Job\"#\n\tEventType\x12\x0b\n\x07RUN_LOG\x10\x00\x12\t\n\x05\x45RROR\x10\x01\"#\n\x0f\x43heckInResponse\x12\x10\n\x08response\x18\x01 \x01(\t2\xec\x01\n\x03Sid\x12\'\n\x06GetJob\x12\x11.sid.HealthStatus\x1a\x08.sid.Job\"\x00\x12\x1e\n\x06\x41\x64\x64Job\x12\x08.sid.Job\x1a\x08.sid.Job\"\x00\x12(\n\x05Login\x12\x11.sid.LoginRequest\x1a\n.sid.Token\"\x00\x12\x42\n\x13HealthStatusCheckIn\x12\x11.sid.HealthStatus\x1a\x14.sid.CheckInResponse\"\x00(\x01\x12.\n\x0cRecordJobRun\x12\x10.sid.JobRunEvent\x1a\x08.sid.Job\"\x00(\x01\x62\x06proto3')
+  serialized_pb=_b('\n\tsid.proto\x12\x03sid\x1a\x1fgoogle/protobuf/timestamp.proto\"F\n\x05Token\x12\r\n\x05token\x18\x01 \x01(\t\x12.\n\nexpires_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"J\n\x0cLoginRequest\x12\x12\n\nidentifier\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x14\n\x0cnew_password\x18\x03 \x01(\t\"\xa4\x01\n\x0cHealthStatus\x12(\n\x06status\x18\x01 \x01(\x0e\x32\x18.sid.HealthStatus.Status\x12-\n\tstatus_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\";\n\x06Status\x12\x0c\n\x08INACTIVE\x10\x00\x12\t\n\x05READY\x10\x01\x12\x0b\n\x07WORKING\x10\x02\x12\x0b\n\x07LEAVING\x10\x03\"\xff\x01\n\x03Job\x12\x11\n\trepo_name\x18\x01 \x01(\t\x12\x14\n\x0crepo_ssh_url\x18\x02 \x01(\t\x12\x15\n\rcommit_hexsha\x18\x03 \x01(\t\x12&\n\njob_status\x18\x04 \x01(\x0e\x32\x12.sid.Job.JobStatus\x12-\n\tstatus_at\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x10\n\x08job_uuid\x18\x06 \x01(\t\"O\n\tJobStatus\x12\n\n\x06QUEUED\x10\x00\x12\x0c\n\x08\x42UILDING\x10\x01\x12\r\n\tABANDONED\x10\x02\x12\r\n\tCOMPLETED\x10\x03\x12\n\n\x06\x46\x41ILED\x10\x05\"\xb2\x01\n\x0bJobRunEvent\x12(\n\x04type\x18\x01 \x01(\x0e\x32\x1a.sid.JobRunEvent.EventType\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\x12,\n\x08\x65vent_at\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x15\n\x03job\x18\x04 \x01(\x0b\x32\x08.sid.Job\"#\n\tEventType\x12\x0b\n\x07RUN_LOG\x10\x00\x12\t\n\x05\x45RROR\x10\x01\"#\n\x0f\x43heckInResponse\x12\x10\n\x08response\x18\x01 \x01(\t2\xec\x01\n\x03Sid\x12\'\n\x06GetJob\x12\x11.sid.HealthStatus\x1a\x08.sid.Job\"\x00\x12\x1e\n\x06\x41\x64\x64Job\x12\x08.sid.Job\x1a\x08.sid.Job\"\x00\x12(\n\x05Login\x12\x11.sid.LoginRequest\x1a\n.sid.Token\"\x00\x12\x42\n\x13HealthStatusCheckIn\x12\x11.sid.HealthStatus\x1a\x14.sid.CheckInResponse\"\x00(\x01\x12.\n\x0cRecordJobRun\x12\x10.sid.JobRunEvent\x1a\x08.sid.Job\"\x00(\x01\x62\x06proto3')
   ,
   dependencies=[google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -52,8 +52,8 @@ _HEALTHSTATUS_STATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=235,
-  serialized_end=294,
+  serialized_start=305,
+  serialized_end=364,
 )
 _sym_db.RegisterEnumDescriptor(_HEALTHSTATUS_STATUS)
 
@@ -86,8 +86,8 @@ _JOB_JOBSTATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=473,
-  serialized_end=552,
+  serialized_start=543,
+  serialized_end=622,
 )
 _sym_db.RegisterEnumDescriptor(_JOB_JOBSTATUS)
 
@@ -108,8 +108,8 @@ _JOBRUNEVENT_EVENTTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=698,
-  serialized_end=733,
+  serialized_start=768,
+  serialized_end=803,
 )
 _sym_db.RegisterEnumDescriptor(_JOBRUNEVENT_EVENTTYPE)
 
@@ -128,6 +128,13 @@ _TOKEN = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='expires_at', full_name='sid.Token.expires_at', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -141,7 +148,7 @@ _TOKEN = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=51,
-  serialized_end=73,
+  serialized_end=121,
 )
 
 
@@ -166,6 +173,13 @@ _LOGINREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='new_password', full_name='sid.LoginRequest.new_password', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -178,8 +192,8 @@ _LOGINREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=75,
-  serialized_end=127,
+  serialized_start=123,
+  serialized_end=197,
 )
 
 
@@ -217,8 +231,8 @@ _HEALTHSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=130,
-  serialized_end=294,
+  serialized_start=200,
+  serialized_end=364,
 )
 
 
@@ -284,8 +298,8 @@ _JOB = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=297,
-  serialized_end=552,
+  serialized_start=367,
+  serialized_end=622,
 )
 
 
@@ -337,8 +351,8 @@ _JOBRUNEVENT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=555,
-  serialized_end=733,
+  serialized_start=625,
+  serialized_end=803,
 )
 
 
@@ -368,10 +382,11 @@ _CHECKINRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=735,
-  serialized_end=770,
+  serialized_start=805,
+  serialized_end=840,
 )
 
+_TOKEN.fields_by_name['expires_at'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 _HEALTHSTATUS.fields_by_name['status'].enum_type = _HEALTHSTATUS_STATUS
 _HEALTHSTATUS.fields_by_name['status_at'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 _HEALTHSTATUS_STATUS.containing_type = _HEALTHSTATUS
@@ -440,8 +455,8 @@ _SID = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=773,
-  serialized_end=1009,
+  serialized_start=843,
+  serialized_end=1079,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetJob',

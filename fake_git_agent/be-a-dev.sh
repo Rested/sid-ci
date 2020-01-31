@@ -26,3 +26,24 @@ touch thing
 git add thing
 git commit -m 'fix thing'
 git push origin
+cd ..
+
+while [ "1" == "1" ]; do
+    git clone ssh://git@fake-git-server:22/git-server/repos/foo-app.git
+    cd foo-app
+    echo "hi" >> README.md
+    git add README.md
+    git commit -m 'greet more'
+    git push origin
+
+    # now bugfix bar
+    cd ..
+    git clone ssh://git@fake-git-server:22/git-server/repos/bar-svc.git
+    cd bar-svc
+    cat /dev/random > thing
+    git add thing
+    git commit -m 'random thing'
+    git push origin
+    cd ..
+    sleep 15
+done

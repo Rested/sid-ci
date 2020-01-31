@@ -69,7 +69,7 @@ class SidServicer(object):
   def HealthStatusCheckIn(self, request_iterator, context):
     """A client-to-server streaming RPC.
 
-    Streams health status of the client as it changes. 
+    Streams health status of the client as it changes.
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')

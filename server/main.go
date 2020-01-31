@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	_ "github.com/lib/pq"
 	"database/sql"
 	"errors"
 	"flag"
@@ -17,8 +18,6 @@ import (
 	"io"
 	"log"
 	"net"
-	"strconv"
-	"strings"
 	"sync"
 	"time"
 )
@@ -76,7 +75,7 @@ func (s *sidServer) AddJob(ctx context.Context, job *pb.Job) (*pb.Job, error) {
 	if val, ok := s.jobMap[job.JobUuid]; ok {
 		return &val, nil
 	}
-	dbJob, err := dbapi.GetJobStatus(ctx, s.db, val.JobUuid)
+	dbJob, err := dbapi.GetJobStatus(ctx, s.db, job.JobUuid)
 	if err != nil {
 		s.jobMap[job.JobUuid] = *job
 		select {
@@ -121,13 +120,13 @@ func (s *sidServer) RecordJobRun(stream pb.Sid_RecordJobRunServer) error {
 	for {
 		jobEvent, err := stream.Recv()
 		if jobEvent.Type == pb.JobRunEvent_ERROR {
-			updatedJob := pb.Job{
-				RepoName:     jobEvent.Job.RepoName,
-				RepoSshUrl:   jobEvent.Job.RepoSshUrl,
-				CommitHexsha: jobEvent.Job.CommitHexsha,
-				JobStatus:    pb.Job_FAILED,
-				StatusAt:     jobEvent.EventAt,
-			}
+			//updatedJob := pb.Job{
+			//	RepoName:     jobEvent.Job.RepoName,
+			//	RepoSshUrl:   jobEvent.Job.RepoSshUrl,
+			//	CommitHexsha: jobEvent.Job.CommitHexsha,
+			//	JobStatus:    pb.Job_FAILED,
+			//	StatusAt:     jobEvent.EventAt,
+			//}
 			// record event async in db
 			// change the job status to failed
 		}
@@ -135,7 +134,7 @@ func (s *sidServer) RecordJobRun(stream pb.Sid_RecordJobRunServer) error {
 			// check the last event was not a failure
 
 			//
-			endTime := time.Now()
+			//endTime := time.Now()
 			return stream.SendAndClose(&pb.Job{})
 		}
 	}
@@ -143,32 +142,34 @@ func (s *sidServer) RecordJobRun(stream pb.Sid_RecordJobRunServer) error {
 
 func newServer(postgresDsn string, redisDsn string) *sidServer {
 	db, err := sql.Open("postgres", postgresDsn)
-	if err != nil {
-		log.Fatalf("failed to connect to db #{err}")
-	}
-	splitRedisDsn := strings.Split(redisDsn, "@")
-	splitAddrDb := strings.Split(splitRedisDsn[1], "/")
-	splitSchemePass := strings.Split(splitRedisDsn[0], "/")
-	redisDb := 0
-	if len(splitAddrDb) == 2 {
-		redisDb, err = strconv.Atoi(splitAddrDb[1])
-		if err != nil {
-			log.Fatalf("Invalid redis db, could not convert db to an int: #{err}")
-		}
-	}
 
-	red := redis.NewClient(&redis.Options{
-		Addr:     splitAddrDb[0],
-		Password: splitSchemePass[1],
-		DB:       redisDb,
-	})
-	_, err = red.Ping().Result()
+	//x := 1
 	if err != nil {
-		log.Fatalf("Failed to connect to redis: #{err}")
+		log.Fatalf("failed to connect to db %v", err)
 	}
+	//splitRedisDsn := strings.Split(redisDsn, "@")
+	//splitAddrDb := strings.Split(splitRedisDsn[1], "/")
+	//splitSchemePass := strings.Split(splitRedisDsn[0], "/")
+	//redisDb := 0
+	//if len(splitAddrDb) == 2 {
+	//	redisDb, err = strconv.Atoi(splitAddrDb[1])
+	//	if err != nil {
+	//		log.Fatalf("Invalid redis db, could not convert db to an int: #{err}")
+	//	}
+	//}
+
+	//red := redis.NewClient(&redis.Options{
+	//	Addr:     splitAddrDb[0],
+	//	Password: splitSchemePass[1],
+	//	DB:       redisDb,
+	//})
+	//_, err = red.Ping().Result()
+	//if err != nil {
+	//	log.Fatalf("Failed to connect to redis: #{err}")
+	//}
 	queue := make(chan string, *queueSize)
 	jobMap := make(map[string]pb.Job)
-	s := &sidServer{db: *db, red: *red, jobQueue: queue, jobMap: jobMap} //routeNotes: make(map[string][]*RouteNote)
+	s := &sidServer{db: *db, jobQueue: queue, jobMap: jobMap} //routeNotes: make(map[string][]*RouteNote)
 	return s
 }
 
