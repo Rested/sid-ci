@@ -28,7 +28,7 @@ profiles:
           context: server
           docker:
             dockerfile: Dockerfile_debug
-        - image: fake_git_agent/server
+        - image: git-server
           context: fake_git_agent/server
           docker:
             dockerfile: Dockerfile
@@ -37,11 +37,15 @@ profiles:
           context: fake_git_agent
         - image: daemon
           context: daemon
+          docker:
+            dockerfile: Dockerfile_debug
+
     deploy:
       kubectl:
           manifests:
             - db/pod.yaml
             - server/pod.yaml
             - fake_git_agent/server/pod.yaml
+            - fake_git_agent/server/fake_keys/secret.yaml
             - fake_git_agent/pod.yaml
             - daemon/pod.yaml

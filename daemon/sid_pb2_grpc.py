@@ -29,6 +29,16 @@ class SidStub(object):
         request_serializer=sid__pb2.LoginRequest.SerializeToString,
         response_deserializer=sid__pb2.Token.FromString,
         )
+    self.ChangePass = channel.unary_unary(
+        '/sid.Sid/ChangePass',
+        request_serializer=sid__pb2.LoginRequest.SerializeToString,
+        response_deserializer=sid__pb2.Token.FromString,
+        )
+    self.GetRepos = channel.unary_stream(
+        '/sid.Sid/GetRepos',
+        request_serializer=sid__pb2.Repo.SerializeToString,
+        response_deserializer=sid__pb2.Repo.FromString,
+        )
     self.HealthStatusCheckIn = channel.stream_unary(
         '/sid.Sid/HealthStatusCheckIn',
         request_serializer=sid__pb2.HealthStatus.SerializeToString,
@@ -61,6 +71,20 @@ class SidServicer(object):
 
   def Login(self, request, context):
     """Log in
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def ChangePass(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def GetRepos(self, request, context):
+    """server to client stream of repos matching repo filter
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -102,6 +126,16 @@ def add_SidServicer_to_server(servicer, server):
           servicer.Login,
           request_deserializer=sid__pb2.LoginRequest.FromString,
           response_serializer=sid__pb2.Token.SerializeToString,
+      ),
+      'ChangePass': grpc.unary_unary_rpc_method_handler(
+          servicer.ChangePass,
+          request_deserializer=sid__pb2.LoginRequest.FromString,
+          response_serializer=sid__pb2.Token.SerializeToString,
+      ),
+      'GetRepos': grpc.unary_stream_rpc_method_handler(
+          servicer.GetRepos,
+          request_deserializer=sid__pb2.Repo.FromString,
+          response_serializer=sid__pb2.Repo.SerializeToString,
       ),
       'HealthStatusCheckIn': grpc.stream_unary_rpc_method_handler(
           servicer.HealthStatusCheckIn,

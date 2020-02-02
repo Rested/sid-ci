@@ -18,6 +18,9 @@ service Sid {
     rpc Login (LoginRequest) returns (Token) {
     }
     rpc ChangePass (LoginRequest) returns (Token) {}
+
+    // server to client stream of repos matching repo filter
+    rpc GetRepos(Repo) returns (stream Repo) {}
     // A client-to-server streaming RPC.
     //
     // Streams health status of the client as it changes.
@@ -86,4 +89,12 @@ message JobRunEvent {
 
 message CheckInResponse {
     string response = 1;
+}
+
+message Repo {
+    string name =1;
+    string ssh_url =2;
+    bool enabled = 3;
+    int32 added_by = 4;
+    google.protobuf.Timestamp added_at = 5;
 }

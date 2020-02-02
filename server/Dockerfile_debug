@@ -4,4 +4,5 @@ COPY . /app/
 WORKDIR /app
 RUN go build -gcflags='all=-N -l' -o main .
 ENV GOTRACEBACK=all
-CMD ["/app/main"]
+ENTRYPOINT ["/app/main"]
+CMD ["-host", "0.0.0.0"]

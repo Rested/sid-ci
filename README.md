@@ -41,4 +41,12 @@ k3d shell --shell zsh
 skaffold dev
 ```
 
+
+## TODO list
+
+1. Client
+1. WebUI
+1. Auth - see https://github.com/jtattermusch/grpc-authentication-kubernetes-examples - mtls daemon - jwt ui/client
+
+
    

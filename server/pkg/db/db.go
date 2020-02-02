@@ -4,11 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	pb "github.com/sid-ci/server/pkg/gen"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -30,7 +32,7 @@ type Result struct {
 
 func GetJobStatus(ctx context.Context, db sql.DB, jobUuid string) (*pb.Job, error) {
 	query := `
-SELECT succeeded, received_at from sid_ci.results where job_uuid = ?;
+SELECT succeeded, received_at from sid_ci.job where job_uuid = $1;
 `
 	var result Result
 	err := db.QueryRowContext(ctx, query, jobUuid).Scan(&result.succeeded, &result.receivedAt)
@@ -57,11 +59,11 @@ SELECT succeeded, received_at from sid_ci.results where job_uuid = ?;
 func RecordHealthStatus(ctx context.Context, db sql.DB, healthStatus pb.HealthStatus) error {
 	query := `
 UPDATE sid_ci.clients SET 
-	last_communication_at = ?,
-	last_status = ?,
-	active = ?
+	last_communication_at = $1,
+	last_status = $2,
+	active = $3
 WHERE
-	id = ?;
+	id = $4;
 `
 	active := true
 	if healthStatus.Status == pb.HealthStatus_INACTIVE {
@@ -108,7 +110,7 @@ func ChangePass(ctx context.Context, db sql.DB, request pb.LoginRequest) error {
 	if err != nil {
 		return err
 	}
-	query := "UPDATE sid_ci.clients set password = ? where identifier = ?"
+	query := "UPDATE sid_ci.clients set password = $1 where identifier = $2"
 	_, err = db.Exec(query, hashedPass, request.Identifier)
 	if err != nil {
 		return err
@@ -118,7 +120,7 @@ func ChangePass(ctx context.Context, db sql.DB, request pb.LoginRequest) error {
 
 func Login(ctx context.Context, db sql.DB, request pb.LoginRequest) (*pb.Token, error) {
 	var userPass string
-	query := "select password from sid_ci.clients where identifier = ?"
+	query := "select password from sid_ci.clients where identifier = $1"
 	err := db.QueryRowContext(ctx, query, request.Identifier).Scan(&userPass)
 	if err != nil {
 		return &pb.Token{}, err
@@ -131,4 +133,47 @@ func Login(ctx context.Context, db sql.DB, request pb.LoginRequest) (*pb.Token, 
 	}
 	return &pb.Token{}, errors.New("passwords did not match")
 
+}
+
+func ListReposMatching(ctx context.Context, db sql.DB, repo *pb.Repo) ([]*pb.Repo, error) {
+
+	queryParts := make([]string, 0, 4)
+	valueParts := make([]interface{}, 0, 4)
+	queryParts = append(queryParts, "enabled = $1")
+	valueParts = append(valueParts, repo.Enabled)
+
+	if repo.AddedBy != 0 {
+		queryParts = append(queryParts, "added_by = $2")
+		valueParts = append(valueParts, repo.AddedBy)
+
+	}
+	if repo.Name != "" {
+		valueParts = append(valueParts, repo.Name)
+		queryParts = append(queryParts, fmt.Sprintf("name ~ $%d", len(queryParts) + 1))
+	}
+
+	if repo.SshUrl != "" {
+		valueParts = append(valueParts, repo.SshUrl)
+		queryParts = append(queryParts, fmt.Sprintf("ssh_url ~ $%d", len(queryParts) + 1))
+	}
+
+	query := fmt.Sprintf("select name, ssh_url, enabled, added_by from sid_ci.repos where %s", strings.Join(queryParts[:], " and "))
+	rows, err := db.QueryContext(ctx, query, valueParts...)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	repos := make([]*pb.Repo, 0)
+	for rows.Next() {
+		var repo pb.Repo
+		if err := rows.Scan(&repo.Name, &repo.SshUrl, &repo.Enabled, &repo.AddedBy); err != nil {
+			// Check for a scan error.
+			// Query rows will be closed with defer.
+			log.Fatal(err)
+		}
+		repos = append(repos, &repo)
+	}
+	return repos, nil
 }

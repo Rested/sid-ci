@@ -14,8 +14,8 @@ class LogLevelEnum(Enum):
 
 class Settings(pydantic.BaseSettings):
     poll_frequency_seconds: int = 60 * 5
-    postgres_dsn: pydantic.PostgresDsn
-    redis_dsn: pydantic.RedisDsn
+    # postgres_dsn: pydantic.PostgresDsn
+    # redis_dsn: pydantic.RedisDsn
     git_projects_path: pathlib.Path = pathlib.Path("/git-projects")
     db_timeout: int = 30
     redis_timeout: int = 30

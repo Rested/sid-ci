@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='sid',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\tsid.proto\x12\x03sid\x1a\x1fgoogle/protobuf/timestamp.proto\"F\n\x05Token\x12\r\n\x05token\x18\x01 \x01(\t\x12.\n\nexpires_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"J\n\x0cLoginRequest\x12\x12\n\nidentifier\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x14\n\x0cnew_password\x18\x03 \x01(\t\"\xa4\x01\n\x0cHealthStatus\x12(\n\x06status\x18\x01 \x01(\x0e\x32\x18.sid.HealthStatus.Status\x12-\n\tstatus_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\";\n\x06Status\x12\x0c\n\x08INACTIVE\x10\x00\x12\t\n\x05READY\x10\x01\x12\x0b\n\x07WORKING\x10\x02\x12\x0b\n\x07LEAVING\x10\x03\"\xff\x01\n\x03Job\x12\x11\n\trepo_name\x18\x01 \x01(\t\x12\x14\n\x0crepo_ssh_url\x18\x02 \x01(\t\x12\x15\n\rcommit_hexsha\x18\x03 \x01(\t\x12&\n\njob_status\x18\x04 \x01(\x0e\x32\x12.sid.Job.JobStatus\x12-\n\tstatus_at\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x10\n\x08job_uuid\x18\x06 \x01(\t\"O\n\tJobStatus\x12\n\n\x06QUEUED\x10\x00\x12\x0c\n\x08\x42UILDING\x10\x01\x12\r\n\tABANDONED\x10\x02\x12\r\n\tCOMPLETED\x10\x03\x12\n\n\x06\x46\x41ILED\x10\x05\"\xb2\x01\n\x0bJobRunEvent\x12(\n\x04type\x18\x01 \x01(\x0e\x32\x1a.sid.JobRunEvent.EventType\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\x12,\n\x08\x65vent_at\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x15\n\x03job\x18\x04 \x01(\x0b\x32\x08.sid.Job\"#\n\tEventType\x12\x0b\n\x07RUN_LOG\x10\x00\x12\t\n\x05\x45RROR\x10\x01\"#\n\x0f\x43heckInResponse\x12\x10\n\x08response\x18\x01 \x01(\t2\xec\x01\n\x03Sid\x12\'\n\x06GetJob\x12\x11.sid.HealthStatus\x1a\x08.sid.Job\"\x00\x12\x1e\n\x06\x41\x64\x64Job\x12\x08.sid.Job\x1a\x08.sid.Job\"\x00\x12(\n\x05Login\x12\x11.sid.LoginRequest\x1a\n.sid.Token\"\x00\x12\x42\n\x13HealthStatusCheckIn\x12\x11.sid.HealthStatus\x1a\x14.sid.CheckInResponse\"\x00(\x01\x12.\n\x0cRecordJobRun\x12\x10.sid.JobRunEvent\x1a\x08.sid.Job\"\x00(\x01\x62\x06proto3')
+  serialized_pb=_b('\n\tsid.proto\x12\x03sid\x1a\x1fgoogle/protobuf/timestamp.proto\"F\n\x05Token\x12\r\n\x05token\x18\x01 \x01(\t\x12.\n\nexpires_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"J\n\x0cLoginRequest\x12\x12\n\nidentifier\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x14\n\x0cnew_password\x18\x03 \x01(\t\"\xa4\x01\n\x0cHealthStatus\x12(\n\x06status\x18\x01 \x01(\x0e\x32\x18.sid.HealthStatus.Status\x12-\n\tstatus_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\";\n\x06Status\x12\x0c\n\x08INACTIVE\x10\x00\x12\t\n\x05READY\x10\x01\x12\x0b\n\x07WORKING\x10\x02\x12\x0b\n\x07LEAVING\x10\x03\"\xff\x01\n\x03Job\x12\x11\n\trepo_name\x18\x01 \x01(\t\x12\x14\n\x0crepo_ssh_url\x18\x02 \x01(\t\x12\x15\n\rcommit_hexsha\x18\x03 \x01(\t\x12&\n\njob_status\x18\x04 \x01(\x0e\x32\x12.sid.Job.JobStatus\x12-\n\tstatus_at\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x10\n\x08job_uuid\x18\x06 \x01(\t\"O\n\tJobStatus\x12\n\n\x06QUEUED\x10\x00\x12\x0c\n\x08\x42UILDING\x10\x01\x12\r\n\tABANDONED\x10\x02\x12\r\n\tCOMPLETED\x10\x03\x12\n\n\x06\x46\x41ILED\x10\x05\"\xb2\x01\n\x0bJobRunEvent\x12(\n\x04type\x18\x01 \x01(\x0e\x32\x1a.sid.JobRunEvent.EventType\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\x12,\n\x08\x65vent_at\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x15\n\x03job\x18\x04 \x01(\x0b\x32\x08.sid.Job\"#\n\tEventType\x12\x0b\n\x07RUN_LOG\x10\x00\x12\t\n\x05\x45RROR\x10\x01\"#\n\x0f\x43heckInResponse\x12\x10\n\x08response\x18\x01 \x01(\t\"v\n\x04Repo\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07ssh_url\x18\x02 \x01(\t\x12\x0f\n\x07\x65nabled\x18\x03 \x01(\x08\x12\x10\n\x08\x61\x64\x64\x65\x64_by\x18\x04 \x01(\x05\x12,\n\x08\x61\x64\x64\x65\x64_at\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp2\xc1\x02\n\x03Sid\x12\'\n\x06GetJob\x12\x11.sid.HealthStatus\x1a\x08.sid.Job\"\x00\x12\x1e\n\x06\x41\x64\x64Job\x12\x08.sid.Job\x1a\x08.sid.Job\"\x00\x12(\n\x05Login\x12\x11.sid.LoginRequest\x1a\n.sid.Token\"\x00\x12-\n\nChangePass\x12\x11.sid.LoginRequest\x1a\n.sid.Token\"\x00\x12$\n\x08GetRepos\x12\t.sid.Repo\x1a\t.sid.Repo\"\x00\x30\x01\x12\x42\n\x13HealthStatusCheckIn\x12\x11.sid.HealthStatus\x1a\x14.sid.CheckInResponse\"\x00(\x01\x12.\n\x0cRecordJobRun\x12\x10.sid.JobRunEvent\x1a\x08.sid.Job\"\x00(\x01\x62\x06proto3')
   ,
   dependencies=[google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -386,6 +386,65 @@ _CHECKINRESPONSE = _descriptor.Descriptor(
   serialized_end=840,
 )
 
+
+_REPO = _descriptor.Descriptor(
+  name='Repo',
+  full_name='sid.Repo',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='sid.Repo.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='ssh_url', full_name='sid.Repo.ssh_url', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='enabled', full_name='sid.Repo.enabled', index=2,
+      number=3, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='added_by', full_name='sid.Repo.added_by', index=3,
+      number=4, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='added_at', full_name='sid.Repo.added_at', index=4,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=842,
+  serialized_end=960,
+)
+
 _TOKEN.fields_by_name['expires_at'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 _HEALTHSTATUS.fields_by_name['status'].enum_type = _HEALTHSTATUS_STATUS
 _HEALTHSTATUS.fields_by_name['status_at'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
@@ -397,12 +456,14 @@ _JOBRUNEVENT.fields_by_name['type'].enum_type = _JOBRUNEVENT_EVENTTYPE
 _JOBRUNEVENT.fields_by_name['event_at'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 _JOBRUNEVENT.fields_by_name['job'].message_type = _JOB
 _JOBRUNEVENT_EVENTTYPE.containing_type = _JOBRUNEVENT
+_REPO.fields_by_name['added_at'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 DESCRIPTOR.message_types_by_name['Token'] = _TOKEN
 DESCRIPTOR.message_types_by_name['LoginRequest'] = _LOGINREQUEST
 DESCRIPTOR.message_types_by_name['HealthStatus'] = _HEALTHSTATUS
 DESCRIPTOR.message_types_by_name['Job'] = _JOB
 DESCRIPTOR.message_types_by_name['JobRunEvent'] = _JOBRUNEVENT
 DESCRIPTOR.message_types_by_name['CheckInResponse'] = _CHECKINRESPONSE
+DESCRIPTOR.message_types_by_name['Repo'] = _REPO
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Token = _reflection.GeneratedProtocolMessageType('Token', (_message.Message,), {
@@ -447,6 +508,13 @@ CheckInResponse = _reflection.GeneratedProtocolMessageType('CheckInResponse', (_
   })
 _sym_db.RegisterMessage(CheckInResponse)
 
+Repo = _reflection.GeneratedProtocolMessageType('Repo', (_message.Message,), {
+  'DESCRIPTOR' : _REPO,
+  '__module__' : 'sid_pb2'
+  # @@protoc_insertion_point(class_scope:sid.Repo)
+  })
+_sym_db.RegisterMessage(Repo)
+
 
 
 _SID = _descriptor.ServiceDescriptor(
@@ -455,8 +523,8 @@ _SID = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=843,
-  serialized_end=1079,
+  serialized_start=963,
+  serialized_end=1284,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetJob',
@@ -486,9 +554,27 @@ _SID = _descriptor.ServiceDescriptor(
     serialized_options=None,
   ),
   _descriptor.MethodDescriptor(
+    name='ChangePass',
+    full_name='sid.Sid.ChangePass',
+    index=3,
+    containing_service=None,
+    input_type=_LOGINREQUEST,
+    output_type=_TOKEN,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetRepos',
+    full_name='sid.Sid.GetRepos',
+    index=4,
+    containing_service=None,
+    input_type=_REPO,
+    output_type=_REPO,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
     name='HealthStatusCheckIn',
     full_name='sid.Sid.HealthStatusCheckIn',
-    index=3,
+    index=5,
     containing_service=None,
     input_type=_HEALTHSTATUS,
     output_type=_CHECKINRESPONSE,
@@ -497,7 +583,7 @@ _SID = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='RecordJobRun',
     full_name='sid.Sid.RecordJobRun',
-    index=4,
+    index=6,
     containing_service=None,
     input_type=_JOBRUNEVENT,
     output_type=_JOB,

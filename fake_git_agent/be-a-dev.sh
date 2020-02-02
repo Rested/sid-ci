@@ -1,4 +1,7 @@
-ssh-keyscan fake-git-server >> gk
+echo "Waiting for git server to be online"
+sleep 20
+
+ssh-keyscan git-server >> gk
 ssh-keygen -lf gk
 cat gk >> /root/.ssh/known_hosts
 cat /root/.ssh/known_hosts
@@ -11,7 +14,7 @@ echo "Sleeping 10 seconds to ensure daemon is up and has done initial clone"
 sleep 10
 
 # make a random change to foo
-git clone ssh://git@fake-git-server:22/git-server/repos/foo-app.git
+git clone ssh://git@git-server:22/git-server/repos/foo-app.git
 cd foo-app
 echo "hi" > README.md
 git add README.md
@@ -20,7 +23,7 @@ git push origin
 
 # now bugfix bar
 cd ..
-git clone ssh://git@fake-git-server:22/git-server/repos/bar-svc.git
+git clone ssh://git@git-server:22/git-server/repos/bar-svc.git
 cd bar-svc
 touch thing
 git add thing
@@ -28,22 +31,22 @@ git commit -m 'fix thing'
 git push origin
 cd ..
 
-while [ "1" == "1" ]; do
-    git clone ssh://git@fake-git-server:22/git-server/repos/foo-app.git
+while true; do
     cd foo-app
     echo "hi" >> README.md
     git add README.md
     git commit -m 'greet more'
+    git pull
     git push origin
 
     # now bugfix bar
-    cd ..
-    git clone ssh://git@fake-git-server:22/git-server/repos/bar-svc.git
-    cd bar-svc
-    cat /dev/random > thing
+    cd ../bar-svc
+    head -n 1 /dev/urandom > thing
     git add thing
     git commit -m 'random thing'
+    git pull
     git push origin
     cd ..
+    echo "Dev having a sip of coffee"
     sleep 15
 done

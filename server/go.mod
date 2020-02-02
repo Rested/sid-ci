@@ -3,6 +3,7 @@ module github.com/sid-ci/server
 go 1.13
 
 require (
+	github.com/caarlos0/env/v6 v6.1.0
 	github.com/go-redis/redis/v7 v7.0.0-beta.5
 	github.com/golang/protobuf v1.3.2
 	github.com/google/uuid v1.1.1

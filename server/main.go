@@ -20,6 +20,7 @@ import (
 	"net"
 	"sync"
 	"time"
+	"github.com/caarlos0/env/v6"
 )
 
 var (
@@ -27,12 +28,14 @@ var (
 	certFile    = flag.String("cert_file", "", "The TLS cert file")
 	keyFile     = flag.String("key_file", "", "The TLS key file")
 	port        = flag.Int("port", 10000, "The server port")
-	host        = flag.String("host", "localhost", "The server host")
-	postgresDsn = flag.String("postgres_dsn", "", "The postgres db dsn, e.g. postgres://user:pass@host:5432/db")
+	host        = flag.String("host", "0.0.0.0", "The server host")
 	redisDsn    = flag.String("redis_dsn", "", "The redis dsn, e.g redis://pass@host:6379")
 	queueSize   = flag.Int("queue_size", 100, "Number of jobs to queue at a time.")
 )
 
+type config struct {
+	PostgresDsn string          `env:"POSTGRES_DSN,required"`
+}
 
 
 var (
@@ -96,6 +99,16 @@ func (s *sidServer) Login(ctx context.Context, details *pb.LoginRequest) (*pb.To
 	return &pb.Token{}, errors.New("login failed")
 }
 
+func (s *sidServer) GetRepos(repo *pb.Repo, stream pb.Sid_GetReposServer) error {
+	repos, err := dbapi.ListReposMatching(context.TODO(), s.db, repo)
+	for _, repo := range repos {
+		if err = stream.Send(repo); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // ListFeatures lists all features contained within the given bounding Rectangle.
 func (s *sidServer) HealthStatusCheckIn(stream pb.Sid_HealthStatusCheckInServer) error {
 	for {
@@ -140,8 +153,14 @@ func (s *sidServer) RecordJobRun(stream pb.Sid_RecordJobRunServer) error {
 	}
 }
 
-func newServer(postgresDsn string, redisDsn string) *sidServer {
-	db, err := sql.Open("postgres", postgresDsn)
+func newServer() *sidServer {
+	cfg := config{}
+	if err := env.Parse(&cfg); err != nil {
+		log.Fatalf("%+v\n", err)
+	}
+	log.Printf("cfg %s", cfg)
+	log.Printf("Connecting to postgres on %s", cfg.PostgresDsn)
+	db, err := sql.Open("postgres", cfg.PostgresDsn)
 
 	//x := 1
 	if err != nil {
@@ -197,6 +216,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	log.Printf("IM HERE 1")
 	var opts []grpc.ServerOption
 	if *tls {
 		if *certFile == "" {
@@ -213,14 +233,17 @@ func main() {
 			grpc.Creds(creds),
 		}
 	}
-	opts = append(
-		opts,
-		grpc.StreamInterceptor(grpc_auth.StreamServerInterceptor(authFunc)),
-		grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(authFunc)))
+	//opts = append(
+	//	opts,
+	//	grpc.StreamInterceptor(grpc_auth.StreamServerInterceptor(authFunc)),
+	//	grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(authFunc)))
 
 	grpcServer := grpc.NewServer(
 		opts...
 	)
-	pb.RegisterSidServer(grpcServer, newServer(*postgresDsn, *redisDsn))
+
+	pb.RegisterSidServer(grpcServer, newServer())
+
+	log.Printf("Sid server listening on %s", fmt.Sprintf("%s:%d", *host, *port))
 	grpcServer.Serve(lis)
 }

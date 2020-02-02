@@ -18,4 +18,4 @@ spec:
           image: git-agent
           env:
             - name: GIT_DISCOVERY_ACROSS_FILESYSTEM
-              value: 1
+              value: "1"

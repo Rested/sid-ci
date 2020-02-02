@@ -1,7 +1,6 @@
 FROM jkarlos/git-server-docker:latest
 
-COPY ./ ./
-RUN ls
+COPY repos/ /git-server/repos
 
 COPY fake_keys/id_rsa.pub /git-server/keys/id_rsa.pub
 RUN cd /git-server/repos && \
