@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS sid_ci.repos
 (
     id       int generated always as identity,
     name     text    not null,
-    ssh_url  text    not null,
+    ssh_url  text    not null unique,
     enabled  boolean not null,
     added_by int references sid_ci.clients (id),
     added_at timestamp,
@@ -27,15 +27,13 @@ CREATE TABLE IF NOT EXISTS sid_ci.repos
 
 CREATE TABLE IF NOT EXISTS sid_ci.job
 (
-    id           int generated always as identity,
-    succeeded    boolean,
-    image_digest text,
-    git_hexsha   text,
-    job_uuid     text,
-    run_by       int references sid_ci.clients (id),
-    repo         int references sid_ci.repos (id),
-    received_at  timestamp,
-    CONSTRAINT jobs_pk PRIMARY KEY (id)
+    job_uuid    text not null unique,
+    status      boolean,
+    image_url   text,
+    git_hexsha  text,
+    repo_url    text,
+    received_at timestamp,
+    CONSTRAINT jobs_pk PRIMARY KEY (job_uuid)
 );
 
 CREATE TABLE IF NOT EXISTS sid_ci.run_event
@@ -44,8 +42,9 @@ CREATE TABLE IF NOT EXISTS sid_ci.run_event
     event_type text,
     content    text,
     event_at   timestamp,
-    job_id     int references sid_ci.job (id),
+    run_by     int references sid_ci.clients (id),
+    job_id     text references sid_ci.job (job_uuid),
     CONSTRAINT run_event_pk PRIMARY KEY (id)
-)
+);
 
 

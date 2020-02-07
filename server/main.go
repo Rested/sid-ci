@@ -79,8 +79,9 @@ func (s *sidServer) AddJob(ctx context.Context, job *pb.Job) (*pb.Job, error) {
 		return &val, nil
 	}
 	dbJob, err := dbapi.GetJobStatus(ctx, s.db, job.JobUuid)
-	if err != nil {
+	if err != nil || dbJob.JobStatus == pb.Job_ABANDONED {
 		s.jobMap[job.JobUuid] = *job
+		go dbapi.UpdateJob(context.Background(), s.db, job)
 		select {
 		case s.jobQueue <- job.JobUuid:
 			log.Printf("Successfully queued job: %s", job.JobUuid)
@@ -113,10 +114,10 @@ func (s *sidServer) GetRepos(repo *pb.Repo, stream pb.Sid_GetReposServer) error 
 func (s *sidServer) HealthStatusCheckIn(stream pb.Sid_HealthStatusCheckInServer) error {
 	for {
 		healthStatus, err := stream.Recv()
-		go dbapi.RecordHealthStatus(stream.Context(), s.db, *healthStatus)
+		go dbapi.RecordHealthStatus(context.Background(), s.db, *healthStatus)
 		if err == io.EOF {
 			// client disconnected
-			go dbapi.RecordHealthStatus(stream.Context(), s.db, pb.HealthStatus{
+			go dbapi.RecordHealthStatus(context.Background(), s.db, pb.HealthStatus{
 				Status:   pb.HealthStatus_INACTIVE,
 				StatusAt: ptypes.TimestampNow(),
 			})

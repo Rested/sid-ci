@@ -20,7 +20,7 @@ type Token struct {
 }
 
 type Result struct {
-	succeeded   bool
+	status      string
 	runEvents   string
 	imageDigest string
 	gitHexSha   string
@@ -32,10 +32,10 @@ type Result struct {
 
 func GetJobStatus(ctx context.Context, db sql.DB, jobUuid string) (*pb.Job, error) {
 	query := `
-SELECT succeeded, received_at from sid_ci.job where job_uuid = $1;
+SELECT status, received_at from sid_ci.job where job_uuid = $1;
 `
 	var result Result
-	err := db.QueryRowContext(ctx, query, jobUuid).Scan(&result.succeeded, &result.receivedAt)
+	err := db.QueryRowContext(ctx, query, jobUuid).Scan(&result.status, &result.receivedAt)
 	if err != nil {
 		return &pb.Job{}, err
 	}
@@ -43,15 +43,8 @@ SELECT succeeded, received_at from sid_ci.job where job_uuid = $1;
 	if err != nil {
 		return &pb.Job{}, err
 	}
-	var status pb.Job_JobStatus
-	if result.succeeded {
-		status = pb.Job_FAILED
-	} else {
-		status = pb.Job_COMPLETED
-	}
 	return &pb.Job{
-		JobStatus: status,
-		JobUuid:   jobUuid,
+		JobStatus: pb.Job_JobStatus(pb.Job_JobStatus_value[result.status]),
 		StatusAt:  statusAt,
 	}, nil
 }
@@ -135,7 +128,7 @@ func Login(ctx context.Context, db sql.DB, request pb.LoginRequest) (*pb.Token, 
 
 }
 
-func ListReposMatching(ctx context.Context, db sql.DB, repo *pb.Repo) ([]*pb.Repo, error) {
+func ListReposMatching(ctx context.Context, db sql.DB, repo *pb.Repo) (retRepos []*pb.Repo, err error) {
 
 	queryParts := make([]string, 0, 4)
 	valueParts := make([]interface{}, 0, 4)
@@ -149,12 +142,12 @@ func ListReposMatching(ctx context.Context, db sql.DB, repo *pb.Repo) ([]*pb.Rep
 	}
 	if repo.Name != "" {
 		valueParts = append(valueParts, repo.Name)
-		queryParts = append(queryParts, fmt.Sprintf("name ~ $%d", len(queryParts) + 1))
+		queryParts = append(queryParts, fmt.Sprintf("name ~ $%d", len(queryParts)+1))
 	}
 
 	if repo.SshUrl != "" {
 		valueParts = append(valueParts, repo.SshUrl)
-		queryParts = append(queryParts, fmt.Sprintf("ssh_url ~ $%d", len(queryParts) + 1))
+		queryParts = append(queryParts, fmt.Sprintf("ssh_url ~ $%d", len(queryParts)+1))
 	}
 
 	query := fmt.Sprintf("select name, ssh_url, enabled, added_by from sid_ci.repos where %s", strings.Join(queryParts[:], " and "))
@@ -163,7 +156,12 @@ func ListReposMatching(ctx context.Context, db sql.DB, repo *pb.Repo) ([]*pb.Rep
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer rows.Close()
+
+	defer func() {
+		if closeError := rows.Close(); closeError != nil {
+			err = closeError
+		}
+	}()
 
 	repos := make([]*pb.Repo, 0)
 	for rows.Next() {
@@ -175,5 +173,23 @@ func ListReposMatching(ctx context.Context, db sql.DB, repo *pb.Repo) ([]*pb.Rep
 		}
 		repos = append(repos, &repo)
 	}
+
 	return repos, nil
+}
+
+func UpdateJob(ctx context.Context, db sql.DB, job *pb.Job) {
+	query := `
+insert into sid_ci.job (job_uuid, status, image_url, git_hexsha, repo_url)
+	values ($1, $2, $3, $4, $5) on conflict (job_uuid) do update set 
+		job_uuid = excluded.job_uuid,
+		status = excluded.status,
+	  	image_url = excluded.image_url,
+	    git_hexsha = excluded.git_hexsha,
+	   	repo_url = excluded.repo_url;
+`
+	_, err := db.QueryContext(ctx, query, job.JobUuid, job.JobStatus, job.ImageUrl, job.CommitHexsha, job.RepoSshUrl)
+	if err != nil {
+		log.Fatalf("Failed to upsert job %s: %v", job.JobUuid, err)
+	}
+	log.Printf("Upserted job %s", job.JobUuid)
 }

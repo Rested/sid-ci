@@ -73,6 +73,7 @@ message Job {
     JobStatus job_status = 4;
     google.protobuf.Timestamp status_at = 5;
     string job_uuid = 6;
+    string image_url = 7;
 }
 
 message JobRunEvent {
