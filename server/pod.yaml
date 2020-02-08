@@ -22,6 +22,15 @@ spec:
             value: postgres://postgres:@dbsvc:5432/postgres?sslmode=disable
         ports:
           - containerPort: 10000
+      - name: grpc-web-proxy
+        image: grpcwebproxy
+        args:
+          - --backend_addr=localhost:10000
+          - --run_tls_server=false
+          - --allow_all_origins
+        ports:
+          - containerPort: 8443
+          - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service

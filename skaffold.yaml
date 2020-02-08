@@ -10,6 +10,12 @@ build:
     context: server
     docker:
       dockerfile: Dockerfile
+  - image: daemon
+    context: daemon
+  - image: grpcwebproxy
+    context: .
+    docker:
+      dockerfile: Dockerfile_grpcwebproxy
 #  local:
 #    push: false
 deploy:
@@ -39,6 +45,10 @@ profiles:
           context: daemon
           docker:
             dockerfile: Dockerfile_debug
+        - image: grpcwebproxy
+          context: .
+          docker:
+            dockerfile: Dockerfile_grpcwebproxy
 
     deploy:
       kubectl:
@@ -49,3 +59,4 @@ profiles:
             - fake_git_agent/server/fake_keys/secret.yaml
             - fake_git_agent/pod.yaml
             - daemon/pod.yaml
+            - grpcwebproxy.yaml

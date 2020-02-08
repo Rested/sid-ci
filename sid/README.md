@@ -12,6 +12,10 @@ Get python protoc generator
 ```bash
 pip install grpcio-tools
 ```
+Get typescript protoc generator
+```bash
+npm install -g ts-protoc-gen
+```
 
 ## Update
 
