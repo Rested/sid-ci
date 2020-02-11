@@ -193,10 +193,12 @@ func ListJobsForRepo(ctx context.Context, db sql.DB, repo *pb.Repo) (retJobs []*
 	jobs := make([]*pb.Job, 0)
 	for rows.Next() {
 		var job pb.Job
+		var status string
 		if err := rows.Scan(&job.JobUuid,
-			&job.JobStatus, &job.ImageUrl, &job.CommitHexsha, &job.RepoSshUrl, &job.StatusAt); err != nil {
+			&status, &job.ImageUrl, &job.CommitHexsha, &job.RepoSshUrl, &job.StatusAt); err != nil {
 			log.Fatal(err)
 		}
+		job.JobStatus = pb.Job_JobStatus(pb.Job_JobStatus_value[status])
 		job.RepoName = repo.Name
 		jobs = append(jobs, &job)
 	}
