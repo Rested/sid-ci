@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	_ "github.com/lib/pq"
 	"database/sql"
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/caarlos0/env/v6"
 	"github.com/go-redis/redis/v7"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	_ "github.com/lib/pq"
 	dbapi "github.com/sid-ci/server/pkg/db"
 	pb "github.com/sid-ci/server/pkg/gen"
 	"google.golang.org/grpc"
@@ -20,8 +21,6 @@ import (
 	"net"
 	"sync"
 	"time"
-	"github.com/caarlos0/env/v6"
-
 )
 
 var (
@@ -103,8 +102,25 @@ func (s *sidServer) Login(ctx context.Context, details *pb.LoginRequest) (*pb.To
 
 func (s *sidServer) GetRepos(repo *pb.Repo, stream pb.Sid_GetReposServer) error {
 	repos, err := dbapi.ListReposMatching(context.TODO(), s.db, repo)
+	if err != nil {
+		return err
+	}
 	for _, repo := range repos {
 		if err = stream.Send(repo); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *sidServer) GetJobs(repo *pb.Repo, stream pb.Sid_GetJobsServer) error {
+
+	jobs, err := dbapi.ListJobsForRepo(stream.Context(), s.db, repo)
+	if err != nil {
+		return err
+	}
+	for _, job := range jobs {
+		if err = stream.Send(job); err != nil {
 			return err
 		}
 	}
@@ -115,7 +131,7 @@ func (s *sidServer) GetRepos(repo *pb.Repo, stream pb.Sid_GetReposServer) error 
 func (s *sidServer) HealthStatusCheckIn(stream pb.Sid_HealthStatusCheckInServer) error {
 	for {
 		healthStatus, err := stream.Recv()
-		go dbapi.RecordHealthStatus(context.Background(), s.db, *healthStatus)
+
 		if err == io.EOF {
 			// client disconnected
 			go dbapi.RecordHealthStatus(context.Background(), s.db, pb.HealthStatus{
@@ -126,6 +142,7 @@ func (s *sidServer) HealthStatusCheckIn(stream pb.Sid_HealthStatusCheckInServer)
 				Response: "Received",
 			})
 		}
+		go dbapi.RecordHealthStatus(context.Background(), s.db, *healthStatus)
 	}
 }
 

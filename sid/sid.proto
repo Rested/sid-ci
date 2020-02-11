@@ -14,13 +14,23 @@ service Sid {
     rpc AddJob (Job) returns (Job) {
     }
 
+    // Add a repo
+    rpc AddRepo (Repo) returns (Repo) {
+    }
+
     // Log in
     rpc Login (LoginRequest) returns (Token) {
     }
-    rpc ChangePass (LoginRequest) returns (Token) {}
+    rpc ChangePass (LoginRequest) returns (Token) {
+    }
 
     // server to client stream of repos matching repo filter
-    rpc GetRepos(Repo) returns (stream Repo) {}
+    rpc GetRepos (Repo) returns (stream Repo) {
+    }
+    // server to client stream of jobs for a repo
+    rpc GetJobs (Repo) returns (stream Job) {
+    }
+
     // A client-to-server streaming RPC.
     //
     // Streams health status of the client as it changes.
@@ -93,8 +103,8 @@ message CheckInResponse {
 }
 
 message Repo {
-    string name =1;
-    string ssh_url =2;
+    string name = 1;
+    string ssh_url = 2;
     bool enabled = 3;
     int32 added_by = 4;
     google.protobuf.Timestamp added_at = 5;

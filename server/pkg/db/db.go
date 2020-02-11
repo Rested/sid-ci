@@ -177,6 +177,34 @@ func ListReposMatching(ctx context.Context, db sql.DB, repo *pb.Repo) (retRepos 
 	return repos, nil
 }
 
+func ListJobsForRepo(ctx context.Context, db sql.DB, repo *pb.Repo) (retJobs []*pb.Job, err error) {
+	query := "select job_uuid, status, image_url, git_hexsha, repo_url, received_at from sid_ci.job where repo_url = $1"
+	rows, err := db.QueryContext(ctx, query, repo.SshUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer func() {
+		if closeError := rows.Close(); closeError != nil {
+			err = closeError
+		}
+	}()
+
+	jobs := make([]*pb.Job, 0)
+	for rows.Next() {
+		var job pb.Job
+		if err := rows.Scan(&job.JobUuid,
+			&job.JobStatus, &job.ImageUrl, &job.CommitHexsha, &job.RepoSshUrl, &job.StatusAt); err != nil {
+			log.Fatal(err)
+		}
+		job.RepoName = repo.Name
+		jobs = append(jobs, &job)
+	}
+
+	return jobs, nil
+
+}
+
 func UpdateJob(ctx context.Context, db sql.DB, job *pb.Job) {
 	query := `
 insert into sid_ci.job (job_uuid, status, image_url, git_hexsha, repo_url)

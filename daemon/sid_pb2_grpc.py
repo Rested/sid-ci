@@ -24,6 +24,11 @@ class SidStub(object):
         request_serializer=sid__pb2.Job.SerializeToString,
         response_deserializer=sid__pb2.Job.FromString,
         )
+    self.AddRepo = channel.unary_unary(
+        '/sid.Sid/AddRepo',
+        request_serializer=sid__pb2.Repo.SerializeToString,
+        response_deserializer=sid__pb2.Repo.FromString,
+        )
     self.Login = channel.unary_unary(
         '/sid.Sid/Login',
         request_serializer=sid__pb2.LoginRequest.SerializeToString,
@@ -38,6 +43,11 @@ class SidStub(object):
         '/sid.Sid/GetRepos',
         request_serializer=sid__pb2.Repo.SerializeToString,
         response_deserializer=sid__pb2.Repo.FromString,
+        )
+    self.GetJobs = channel.unary_stream(
+        '/sid.Sid/GetJobs',
+        request_serializer=sid__pb2.Repo.SerializeToString,
+        response_deserializer=sid__pb2.Job.FromString,
         )
     self.HealthStatusCheckIn = channel.stream_unary(
         '/sid.Sid/HealthStatusCheckIn',
@@ -69,6 +79,13 @@ class SidServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def AddRepo(self, request, context):
+    """Add a repo
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def Login(self, request, context):
     """Log in
     """
@@ -85,6 +102,13 @@ class SidServicer(object):
 
   def GetRepos(self, request, context):
     """server to client stream of repos matching repo filter
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def GetJobs(self, request, context):
+    """server to client stream of jobs for a repo
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -122,6 +146,11 @@ def add_SidServicer_to_server(servicer, server):
           request_deserializer=sid__pb2.Job.FromString,
           response_serializer=sid__pb2.Job.SerializeToString,
       ),
+      'AddRepo': grpc.unary_unary_rpc_method_handler(
+          servicer.AddRepo,
+          request_deserializer=sid__pb2.Repo.FromString,
+          response_serializer=sid__pb2.Repo.SerializeToString,
+      ),
       'Login': grpc.unary_unary_rpc_method_handler(
           servicer.Login,
           request_deserializer=sid__pb2.LoginRequest.FromString,
@@ -136,6 +165,11 @@ def add_SidServicer_to_server(servicer, server):
           servicer.GetRepos,
           request_deserializer=sid__pb2.Repo.FromString,
           response_serializer=sid__pb2.Repo.SerializeToString,
+      ),
+      'GetJobs': grpc.unary_stream_rpc_method_handler(
+          servicer.GetJobs,
+          request_deserializer=sid__pb2.Repo.FromString,
+          response_serializer=sid__pb2.Job.SerializeToString,
       ),
       'HealthStatusCheckIn': grpc.stream_unary_rpc_method_handler(
           servicer.HealthStatusCheckIn,

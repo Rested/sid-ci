@@ -22,6 +22,15 @@ type SidAddJob = {
   readonly responseType: typeof sid_pb.Job;
 };
 
+type SidAddRepo = {
+  readonly methodName: string;
+  readonly service: typeof Sid;
+  readonly requestStream: false;
+  readonly responseStream: false;
+  readonly requestType: typeof sid_pb.Repo;
+  readonly responseType: typeof sid_pb.Repo;
+};
+
 type SidLogin = {
   readonly methodName: string;
   readonly service: typeof Sid;
@@ -49,6 +58,15 @@ type SidGetRepos = {
   readonly responseType: typeof sid_pb.Repo;
 };
 
+type SidGetJobs = {
+  readonly methodName: string;
+  readonly service: typeof Sid;
+  readonly requestStream: false;
+  readonly responseStream: true;
+  readonly requestType: typeof sid_pb.Repo;
+  readonly responseType: typeof sid_pb.Job;
+};
+
 type SidHealthStatusCheckIn = {
   readonly methodName: string;
   readonly service: typeof Sid;
@@ -71,9 +89,11 @@ export class Sid {
   static readonly serviceName: string;
   static readonly GetJob: SidGetJob;
   static readonly AddJob: SidAddJob;
+  static readonly AddRepo: SidAddRepo;
   static readonly Login: SidLogin;
   static readonly ChangePass: SidChangePass;
   static readonly GetRepos: SidGetRepos;
+  static readonly GetJobs: SidGetJobs;
   static readonly HealthStatusCheckIn: SidHealthStatusCheckIn;
   static readonly RecordJobRun: SidRecordJobRun;
 }
@@ -128,6 +148,15 @@ export class SidClient {
     requestMessage: sid_pb.Job,
     callback: (error: ServiceError|null, responseMessage: sid_pb.Job|null) => void
   ): UnaryResponse;
+  addRepo(
+    requestMessage: sid_pb.Repo,
+    metadata: grpc.Metadata,
+    callback: (error: ServiceError|null, responseMessage: sid_pb.Repo|null) => void
+  ): UnaryResponse;
+  addRepo(
+    requestMessage: sid_pb.Repo,
+    callback: (error: ServiceError|null, responseMessage: sid_pb.Repo|null) => void
+  ): UnaryResponse;
   login(
     requestMessage: sid_pb.LoginRequest,
     metadata: grpc.Metadata,
@@ -147,6 +176,7 @@ export class SidClient {
     callback: (error: ServiceError|null, responseMessage: sid_pb.Token|null) => void
   ): UnaryResponse;
   getRepos(requestMessage: sid_pb.Repo, metadata?: grpc.Metadata): ResponseStream<sid_pb.Repo>;
+  getJobs(requestMessage: sid_pb.Repo, metadata?: grpc.Metadata): ResponseStream<sid_pb.Job>;
   healthStatusCheckIn(metadata?: grpc.Metadata): RequestStream<sid_pb.HealthStatus>;
   recordJobRun(metadata?: grpc.Metadata): RequestStream<sid_pb.JobRunEvent>;
 }

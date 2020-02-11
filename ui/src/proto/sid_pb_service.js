@@ -28,6 +28,15 @@ Sid.AddJob = {
   responseType: sid_pb.Job
 };
 
+Sid.AddRepo = {
+  methodName: "AddRepo",
+  service: Sid,
+  requestStream: false,
+  responseStream: false,
+  requestType: sid_pb.Repo,
+  responseType: sid_pb.Repo
+};
+
 Sid.Login = {
   methodName: "Login",
   service: Sid,
@@ -53,6 +62,15 @@ Sid.GetRepos = {
   responseStream: true,
   requestType: sid_pb.Repo,
   responseType: sid_pb.Repo
+};
+
+Sid.GetJobs = {
+  methodName: "GetJobs",
+  service: Sid,
+  requestStream: false,
+  responseStream: true,
+  requestType: sid_pb.Repo,
+  responseType: sid_pb.Job
 };
 
 Sid.HealthStatusCheckIn = {
@@ -116,6 +134,37 @@ SidClient.prototype.addJob = function addJob(requestMessage, metadata, callback)
     callback = arguments[1];
   }
   var client = grpc.unary(Sid.AddJob, {
+    request: requestMessage,
+    host: this.serviceHost,
+    metadata: metadata,
+    transport: this.options.transport,
+    debug: this.options.debug,
+    onEnd: function (response) {
+      if (callback) {
+        if (response.status !== grpc.Code.OK) {
+          var err = new Error(response.statusMessage);
+          err.code = response.status;
+          err.metadata = response.trailers;
+          callback(err, null);
+        } else {
+          callback(null, response.message);
+        }
+      }
+    }
+  });
+  return {
+    cancel: function () {
+      callback = null;
+      client.close();
+    }
+  };
+};
+
+SidClient.prototype.addRepo = function addRepo(requestMessage, metadata, callback) {
+  if (arguments.length === 2) {
+    callback = arguments[1];
+  }
+  var client = grpc.unary(Sid.AddRepo, {
     request: requestMessage,
     host: this.serviceHost,
     metadata: metadata,
@@ -211,6 +260,45 @@ SidClient.prototype.getRepos = function getRepos(requestMessage, metadata) {
     status: []
   };
   var client = grpc.invoke(Sid.GetRepos, {
+    request: requestMessage,
+    host: this.serviceHost,
+    metadata: metadata,
+    transport: this.options.transport,
+    debug: this.options.debug,
+    onMessage: function (responseMessage) {
+      listeners.data.forEach(function (handler) {
+        handler(responseMessage);
+      });
+    },
+    onEnd: function (status, statusMessage, trailers) {
+      listeners.status.forEach(function (handler) {
+        handler({ code: status, details: statusMessage, metadata: trailers });
+      });
+      listeners.end.forEach(function (handler) {
+        handler({ code: status, details: statusMessage, metadata: trailers });
+      });
+      listeners = null;
+    }
+  });
+  return {
+    on: function (type, handler) {
+      listeners[type].push(handler);
+      return this;
+    },
+    cancel: function () {
+      listeners = null;
+      client.close();
+    }
+  };
+};
+
+SidClient.prototype.getJobs = function getJobs(requestMessage, metadata) {
+  var listeners = {
+    data: [],
+    end: [],
+    status: []
+  };
+  var client = grpc.invoke(Sid.GetJobs, {
     request: requestMessage,
     host: this.serviceHost,
     metadata: metadata,
