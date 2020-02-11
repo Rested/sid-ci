@@ -9,4 +9,4 @@ RUN chmod 400 /root/.ssh/id_rsa
 RUN chmod +x be-a-dev.sh
 
 ENTRYPOINT [ "/bin/sh", "-c" ]
-CMD [ "./be-a-dev.sh" ]ls
+CMD [ "./be-a-dev.sh" ]
