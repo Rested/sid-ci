@@ -3,7 +3,7 @@ import { ADD_REPO, SELECT_REPO, REPOS_INIT } from '../actions/repos';
 import { Repo } from '../proto/sid_pb';
 
 export type ReposState = {
-    readonly repos: { [storyId: number]: Repo.AsObject },
+    readonly repos: { [repoSshUrl: string]: Repo.AsObject },
     readonly error: Error | null,
     readonly loading: boolean,
     readonly selected: Repo.AsObject | null,

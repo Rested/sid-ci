@@ -6,6 +6,7 @@ import { Container, Grid, Header } from 'semantic-ui-react';
 import RootAction from '../actions';
 import { listRepos, selectRepo } from '../actions/repos';
 import { Repo } from '../proto/sid_pb';
+import RepoJobs from "./RepoJobs";
 
 type ReposProps = {
     repos: Repo.AsObject[],
@@ -34,10 +35,7 @@ class Repos extends React.Component<ReposProps, {}> {
                     </Grid.Column>
 
                     <Grid.Column width={12} stretched={true}>
-                        { this.props.selected
-                            ? <div>{JSON.stringify(this.props.selected)}</div>
-                            : null
-                        }
+                        <RepoJobs/>
                     </Grid.Column>
                 </Grid>
 
