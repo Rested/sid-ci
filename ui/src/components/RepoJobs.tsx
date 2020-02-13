@@ -24,7 +24,7 @@ const RepoJobs: React.FC<RepoJobsProps> = ({repoSshUrl, loading, jobs, error, se
     useEffect(() => {
         if (repoSshUrl) fetchJobs(repoSshUrl);
     }, [repoSshUrl]);
-    if (!repoSshUrl){
+    if (!repoSshUrl) {
         return null
     }
     if (loading) {
@@ -33,7 +33,7 @@ const RepoJobs: React.FC<RepoJobsProps> = ({repoSshUrl, loading, jobs, error, se
 
     return (
         <Container>
-            {jobs.map( j => <div onClick={()=> selectJob(j.jobUuid)}>{JSON.stringify(j)}</div>)}
+            {jobs.map(j => <div onClick={() => selectJob(j.jobUuid)}>{JSON.stringify(j)}</div>)}
         </Container>
     );
 };
@@ -42,7 +42,8 @@ function mapStateToProps(state: RootState) {
     const {jobs} = state;
     return {
         ...jobs,
-        jobs: Object.keys(jobs.jobs).map(uuid => jobs.jobs[uuid]),
+        jobs: Object.keys(jobs.jobs).map(uuid => jobs.jobs[uuid])
+            .filter(job => job.repoSshUrl === state.repos.selected?.sshUrl),
         repoSshUrl: state.repos.selected ? state.repos.selected?.sshUrl : null
     }
 }

@@ -24,19 +24,18 @@ import (
 )
 
 var (
-	tls         = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
-	certFile    = flag.String("cert_file", "", "The TLS cert file")
-	keyFile     = flag.String("key_file", "", "The TLS key file")
-	port        = flag.Int("port", 10000, "The server port")
-	host        = flag.String("host", "0.0.0.0", "The server host")
-	redisDsn    = flag.String("redis_dsn", "", "The redis dsn, e.g redis://pass@host:6379")
-	queueSize   = flag.Int("queue_size", 100, "Number of jobs to queue at a time.")
+	tls       = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
+	certFile  = flag.String("cert_file", "", "The TLS cert file")
+	keyFile   = flag.String("key_file", "", "The TLS key file")
+	port      = flag.Int("port", 10000, "The server port")
+	host      = flag.String("host", "0.0.0.0", "The server host")
+	redisDsn  = flag.String("redis_dsn", "", "The redis dsn, e.g redis://pass@host:6379")
+	queueSize = flag.Int("queue_size", 100, "Number of jobs to queue at a time.")
 )
 
 type config struct {
-	PostgresDsn string          `env:"POSTGRES_DSN,required"`
+	PostgresDsn string `env:"POSTGRES_DSN,required"`
 }
-
 
 var (
 	tokenCache map[string]dbapi.Token
@@ -51,6 +50,7 @@ type sidServer struct {
 	red        redis.Client
 	jobMap     map[string]pb.Job
 	jobQueue   chan string
+	jobStreams map[*pb.Sid_GetJobsServer]chan pb.Job
 	// routeNotes map[string][]*
 }
 
@@ -82,18 +82,24 @@ func (s *sidServer) AddJob(ctx context.Context, job *pb.Job) (*pb.Job, error) {
 	if err != nil || dbJob.JobStatus == pb.Job_ABANDONED {
 		s.jobMap[job.JobUuid] = *job
 		go dbapi.UpdateJob(context.Background(), s.db, job)
+
 		select {
 		case s.jobQueue <- job.JobUuid:
 			log.Printf("Successfully queued job: %s", job.JobUuid)
 		default:
 			log.Fatalf("Failed to queue job: %s", job.JobUuid)
 		}
+
+		for _, jobChan := range s.jobStreams {
+			jobChan <- *job
+		}
+
 		return job, nil
 	}
 	return dbJob, nil
 }
 
-func (s *sidServer) Login(ctx context.Context, details *pb.LoginRequest) (*pb.Token, error)  {
+func (s *sidServer) Login(ctx context.Context, details *pb.LoginRequest) (*pb.Token, error) {
 	// check if details match someone
 	// if so return a token
 	// otherwise return nothing
@@ -119,12 +125,34 @@ func (s *sidServer) GetJobs(repo *pb.Repo, stream pb.Sid_GetJobsServer) error {
 	if err != nil {
 		return err
 	}
+	streamJobQueue := make(chan pb.Job, 10)
+	s.jobStreams[&stream] = streamJobQueue
+
 	for _, job := range jobs {
 		if err = stream.Send(job); err != nil {
 			return err
 		}
 	}
-	return nil
+	// long running stream to client
+	ctx := stream.Context()
+	for {
+		select {
+		case job := <-s.jobStreams[&stream]:
+			if err = stream.Send(&job); err != nil {
+				log.Printf("Error sending new event. Deleting stream. Job streams length %d. %v", len(s.jobStreams), err)
+				delete(s.jobStreams, &stream)
+				return err
+			}
+		case <-ctx.Done():
+			err = ctx.Err()
+			if err == context.Canceled {
+				log.Printf("Client cancelled, abandoning.")
+			}
+			log.Printf("Error sending new event. Deleting stream. Job streams length %d. %v", len(s.jobStreams), err)
+			delete(s.jobStreams, &stream)
+			return err
+		}
+	}
 }
 
 // ListFeatures lists all features contained within the given bounding Rectangle.
@@ -207,7 +235,8 @@ func newServer() *sidServer {
 	//}
 	queue := make(chan string, *queueSize)
 	jobMap := make(map[string]pb.Job)
-	s := &sidServer{db: *db, jobQueue: queue, jobMap: jobMap} //routeNotes: make(map[string][]*RouteNote)
+	jobStream := make(map[*pb.Sid_GetJobsServer]chan pb.Job, 0)
+	s := &sidServer{db: *db, jobQueue: queue, jobMap: jobMap, jobStreams: jobStream} //routeNotes: make(map[string][]*RouteNote)
 	return s
 }
 

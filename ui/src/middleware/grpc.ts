@@ -3,7 +3,7 @@ import { grpc } from '@improbable-eng/grpc-web';
 import * as jspb from 'google-protobuf';
 
 const GRPC_WEB_REQUEST = 'GRPC_WEB_REQUEST';
-
+grpc.setDefaultTransport(grpc.WebsocketTransport())
 // Descriptor of a grpc-web payload
 // life-cycle methods mirror grpc-web but allow for an action to be dispatched when triggered
 export type GrpcActionPayload<RequestType extends jspb.Message, ResponseType extends jspb.Message> = {
