@@ -4,5 +4,8 @@ COPY . /app/
 WORKDIR /app
 RUN go build -gcflags='all=-N -l' -o main .
 ENV GOTRACEBACK=all
+ENV GRPC_VERBOSITY=DEBUG
+ENV GRPC_TRACE=all
+ENV GODEBUG=http2debug=2
 ENTRYPOINT ["/app/main"]
 CMD ["-host", "0.0.0.0"]
