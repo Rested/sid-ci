@@ -14,6 +14,10 @@ type AddJob = {
 };
 export const addJob = (repo: Job) => ({ type: ADD_JOB, payload: repo });
 
+// This is because we only want one request listening for jobs at a time
+let lastRequest: grpc.Request | null = null;
+
+
 type ListJobsInit = {
     type: typeof JOBS_INIT,
     payload: string
@@ -21,6 +25,7 @@ type ListJobsInit = {
 export const listJobsInit = (repoSshUrl: string): ListJobsInit => ({type: JOBS_INIT, payload: repoSshUrl});
 
 export const listJobs = (repoSshUrl: string) => {
+    if (lastRequest) lastRequest.close();
     const repo = new Repo();
     repo.setSshUrl(repoSshUrl);
     return grpcRequest<Repo,Job>({
@@ -38,6 +43,10 @@ export const listJobs = (repoSshUrl: string) => {
             }
             return
         },
+        withGrpcRequest: grpcReq => {
+            lastRequest = grpcReq;
+            return;
+        }
     });
 };
 

@@ -1,11 +1,11 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import {bindActionCreators, Dispatch} from 'redux';
-import { RootState } from '../store';
-import { Container, Grid, Header } from 'semantic-ui-react';
+import {RootState} from '../store';
+import {Container, Grid, Menu} from 'semantic-ui-react';
 import RootAction from '../actions';
-import { listRepos, selectRepo } from '../actions/repos';
-import { Repo } from '../proto/sid_pb';
+import {listRepos, selectRepo} from '../actions/repos';
+import {Repo} from '../proto/sid_pb';
 import RepoJobs from "./RepoJobs";
 
 type ReposProps = {
@@ -27,14 +27,18 @@ class Repos extends React.Component<ReposProps, {}> {
     render() {
         return (
             <Container style={{padding: '1em'}} fluid={true}>
-                <Header as="h1" dividing={true}>Hacker News with gRPC-Web</Header>
 
-                <Grid columns={2} stackable={true} divided={'vertically'}>
-                    <Grid.Column width={4}>
-                        {this.props.repos.map(r => <div onClick={()=> this.props.selectRepo(r.sshUrl)}>{JSON.stringify(r)}</div>)}
+                <Grid columns={2} divided>
+                    <Grid.Column width={4} stretched>
+                        <Menu vertical fluid>
+                            {this.props.repos.map(repo => (
+                                <Menu.Item name={repo.name} active={repo.sshUrl === this.props.selected?.sshUrl}
+                                           onClick={() => this.props.selectRepo(repo.sshUrl)}/>
+                            ))}
+                        </Menu>
                     </Grid.Column>
 
-                    <Grid.Column width={12} stretched={true}>
+                    <Grid.Column width={4} stretched={true}>
                         <RepoJobs/>
                     </Grid.Column>
                 </Grid>

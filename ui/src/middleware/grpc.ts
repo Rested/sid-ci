@@ -27,6 +27,8 @@ export type GrpcActionPayload<RequestType extends jspb.Message, ResponseType ext
     onMessage?: (res: ResponseType) => Action | void,
     // Called at the end of a request, make sure to check the exit code
     onEnd: (code: grpc.Code, message: string, trailers: grpc.Metadata) => Action | void,
+    // Called when the rpc is invoked
+    withGrpcRequest?: (grpcReq: grpc.Request) => Action | void,
 };
 
 // Basic type for a gRPC Action
@@ -59,7 +61,7 @@ export function newGrpcMiddleware(): Middleware {
             payload.onStart();
         }
 
-        grpc.invoke(payload.methodDescriptor, {
+        const grpcReq = grpc.invoke(payload.methodDescriptor, {
             debug: payload.debug,
             host: payload.host,
             request: payload.request,
@@ -80,6 +82,9 @@ export function newGrpcMiddleware(): Middleware {
                 return actionToDispatch && dispatch(actionToDispatch);
             },
         });
+        if (payload.withGrpcRequest){
+            payload.withGrpcRequest(grpcReq)
+        }
 
         return next(action);
     };

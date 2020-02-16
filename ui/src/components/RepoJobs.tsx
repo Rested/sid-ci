@@ -1,11 +1,12 @@
 import React, {useEffect} from 'react';
-import {Container} from "semantic-ui-react";
-import {Job} from "../proto/sid_pb";
+import {Container, Menu} from "semantic-ui-react";
+import {Job, Repo} from "../proto/sid_pb";
 import {RootState} from "../store";
 import {bindActionCreators, Dispatch} from "redux";
 import RootAction from "../actions";
 import {listJobs, selectJob} from "../actions/jobs";
 import {connect} from "react-redux";
+import RepoInfo from "./RepoInfo";
 
 
 type RepoJobsProps = {
@@ -13,18 +14,18 @@ type RepoJobsProps = {
     loading: boolean,
     error: Error | null,
     selected: Job.AsObject | null,
-    repoSshUrl: string | null,
+    selectedRepo: Repo.AsObject | null,
 
     fetchJobs: (repoSshUrl: string) => void,
     selectJob: (uuid: string) => void
 }
 
-const RepoJobs: React.FC<RepoJobsProps> = ({repoSshUrl, loading, jobs, error, selected, fetchJobs, selectJob}) => {
+const RepoJobs: React.FC<RepoJobsProps> = ({selectedRepo, loading, jobs, error, selected, fetchJobs, selectJob}) => {
 
     useEffect(() => {
-        if (repoSshUrl) fetchJobs(repoSshUrl);
-    }, [repoSshUrl]);
-    if (!repoSshUrl) {
+        if (selectedRepo) fetchJobs(selectedRepo.sshUrl);
+    }, [selectedRepo, fetchJobs]);
+    if (!selectedRepo) {
         return null
     }
     if (loading) {
@@ -33,7 +34,13 @@ const RepoJobs: React.FC<RepoJobsProps> = ({repoSshUrl, loading, jobs, error, se
 
     return (
         <Container>
-            {jobs.map(j => <div onClick={() => selectJob(j.jobUuid)}>{JSON.stringify(j)}</div>)}
+            <RepoInfo repo={selectedRepo}/>
+            <Menu fluid vertical>
+                {jobs.map(job => (
+                    <Menu.Item name={job.commitHexsha} active={job.jobUuid === selected?.jobUuid}
+                               onClick={() => selectJob(job.jobUuid)}/>
+                ))}
+            </Menu>
         </Container>
     );
 };
@@ -44,7 +51,7 @@ function mapStateToProps(state: RootState) {
         ...jobs,
         jobs: Object.keys(jobs.jobs).map(uuid => jobs.jobs[uuid])
             .filter(job => job.repoSshUrl === state.repos.selected?.sshUrl),
-        repoSshUrl: state.repos.selected ? state.repos.selected?.sshUrl : null
+        selectedRepo: state.repos.selected
     }
 }
 
