@@ -44,9 +44,16 @@ skaffold dev
 
 ## TODO list
 
-1. Client
-1. WebUI
-1. Auth - see https://github.com/jtattermusch/grpc-authentication-kubernetes-examples - mtls daemon - jwt ui/client
+* Daemon
+    1. Provide more than just commit hash - what branch, what pr etc
+* Server
+* Client
+    1. figure out job spec format
+    2. write cli
+* WebUI
+    1. Better handling of jobs
+* General
+    1. Auth - see https://github.com/jtattermusch/grpc-authentication-kubernetes-examples - mtls daemon - jwt ui/client
 
 
    
