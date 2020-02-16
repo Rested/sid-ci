@@ -60,15 +60,18 @@ func (s *sidServer) GetJob(ctx context.Context, healthStatus *pb.HealthStatus) (
 	select {
 	case nextJobUUID := <-s.jobQueue:
 		job := s.jobMap[nextJobUUID]
-		// return job with updated time and status
-		return &pb.Job{
+		pbJob := pb.Job{
 			RepoName:     job.RepoName,
 			RepoSshUrl:   job.RepoSshUrl,
 			CommitHexsha: job.CommitHexsha,
 			JobStatus:    pb.Job_BUILDING,
 			StatusAt:     ptypes.TimestampNow(),
 			JobUuid:      job.JobUuid,
-		}, nil
+		}
+		// delete job from map
+		delete(s.jobMap, nextJobUUID)
+		// return job with updated time and status
+		return &pbJob, nil
 	default:
 		return &pb.Job{StatusAt: ptypes.TimestampNow()}, nil
 	}
@@ -80,19 +83,32 @@ func (s *sidServer) AddJob(ctx context.Context, job *pb.Job) (*pb.Job, error) {
 	}
 	dbJob, err := dbapi.GetJobStatus(ctx, s.db, job.JobUuid)
 	if err != nil || dbJob.JobStatus == pb.Job_ABANDONED {
-		s.jobMap[job.JobUuid] = *job
-		go dbapi.UpdateJob(context.Background(), s.db, job)
 
 		select {
 		case s.jobQueue <- job.JobUuid:
+			s.jobMap[job.JobUuid] = *job
 			log.Printf("Successfully queued job: %s", job.JobUuid)
 		default:
-			log.Fatalf("Failed to queue job: %s", job.JobUuid)
+			log.Printf("Failed to queue job: %s.", job.JobUuid)
+			if len(s.jobQueue) == cap(s.jobQueue) {
+				log.Printf(`Capacity of jobQueue (%d) reached. Jobs will now be stored as abandonned in db. 
+consider using a larger queue or adding more clients.`, cap(s.jobQueue))
+			}
+			job = &pb.Job{
+				RepoName:     job.RepoName,
+				RepoSshUrl:   job.RepoName,
+				CommitHexsha: job.CommitHexsha,
+				JobStatus:    pb.Job_ABANDONED,
+				StatusAt:     ptypes.TimestampNow(),
+				JobUuid:      job.JobUuid,
+				ImageUrl:     job.ImageUrl,
+			}
 		}
-
+		go dbapi.UpdateJob(context.Background(), s.db, job)
 		for _, jobChan := range s.jobStreams {
 			jobChan <- *job
 		}
+
 
 		return job, nil
 	}
